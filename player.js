@@ -1,0 +1,77 @@
+export default class Player {
+    constructor(x, y, keys, canvas) {
+        this.x = x;
+        this.y = y;
+
+        this.keys = keys;
+        this.canvas = canvas;
+
+        this.radius = 20;
+        this.speed = 400;
+        this.hp = 100;
+    }
+
+    checkHits(bullets) {
+
+        for (let i = bullets.length - 1; i >= 0; i--) {
+
+            const bullet = bullets[i];
+
+            const dx = this.x - bullet.x;
+            const dy = this.y - bullet.y;
+
+            const distance = Math.hypot(dx, dy);
+
+            if (distance < this.radius + bullet.radius) {
+
+                this.hp--;
+
+                bullets.splice(i, 1);
+            }
+        }
+    }
+
+    update(deltaTime) {
+        if (this.keys["w"]) {
+            this.y -= this.speed * deltaTime;
+        }
+
+        if (this.keys["s"]) {
+            this.y += this.speed * deltaTime;
+        }
+
+        if (this.keys["a"]) {
+            this.x -= this.speed * deltaTime;
+        }
+
+        if (this.keys["d"]) {
+            this.x += this.speed * deltaTime;
+        }
+
+        this.x = Math.max(this.radius, this.x);
+        this.x = Math.min(
+            this.canvas.width - this.radius,
+            this.x
+        );
+
+        this.y = Math.max(this.radius, this.y);
+        this.y = Math.min(
+            this.canvas.height - this.radius,
+            this.y
+        );
+    }
+
+    draw(ctx) {
+        ctx.fillStyle = "white";
+
+        ctx.beginPath();
+        ctx.arc(
+            this.x,
+            this.y,
+            this.radius,
+            0,
+            Math.PI * 2
+        );
+        ctx.fill();
+    }
+}

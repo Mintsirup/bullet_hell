@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Bullet Hell</title>
+
+    <style>
+        body {
+            margin: 0;
+            background: black;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            height: 100vh;
+            flex-direction: column;
+
+            color: white;
+            font-family: Arial;
+        }
+
+        h1 {
+            font-size: 80px;
+        }
+
+        button {
+            width: 250px;
+            height: 60px;
+
+            font-size: 24px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Bullet Hell</h1>
+
+    <button id="startButton">
+        game start
+    </button>
+
+    <script>
+        document
+            .getElementById("startButton")
+            .addEventListener("click", () => {
+
+                location.href = "game.html";
+            });
+    </script>
+
+</body>
+</html>
