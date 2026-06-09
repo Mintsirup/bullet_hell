@@ -1,12 +1,15 @@
 import CirclePattern from "../patterns/CirclePattern.js";
-import SpinPattern from "../patterns/SpinPattern.js";
+import WallPattern from "../patterns/WallPattern.js";
+
+import boss from "../boss.js"
 
 export default class Phase1 {
 
-    constructor(boss) {
+    constructor(canvas, boss) {
 
         this.patterns = [
-            new SpinPattern(boss)
+            new WallPattern(canvas),
+            new CirclePattern(boss)
         ];
     }
 
@@ -16,9 +19,9 @@ export default class Phase1 {
 
         for (const pattern of this.patterns) {
 
-            spawned.push(
-                ...pattern.update(deltaTime)
-            );
+            const bullets = pattern.update(deltaTime);
+
+            spawned.push(...bullets);
         }
 
         return spawned;

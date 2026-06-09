@@ -1,32 +1,58 @@
-import SpinPattern from "../patterns/SpinPattern.js";
+import CirclePattern from "../patterns/CirclePattern.js";
 import RainPattern from "../patterns/RainPattern.js";
+import SpinPattern from "../patterns/SpinPattern.js";
+import WallPattern from "../patterns/WallPattern.js";
 
 export default class Phase3 {
 
     constructor(canvas, boss) {
 
-        this.patterns = [
-            new SpinPattern(boss),
-            new RainPattern(canvas)
+        this.canvas = canvas;
+        this.boss = boss;
+
+        this.changeTimer = 0;
+
+        this.currentPattern =
+            new CirclePattern(boss);
+    }
+
+    getRandomPattern() {
+
+        const patterns = [
+            () => new CirclePattern(this.boss),
+            () => new RainPattern(this.canvas),
+            () => new SpinPattern(this.boss),
+            () => new WallPattern(this.canvas)
         ];
+
+        const random =
+            Math.floor(
+                Math.random() *
+                patterns.length
+            );
+
+        return patterns[random]();
     }
 
     update(deltaTime) {
 
-        const spawned = [];
+        this.changeTimer += deltaTime;
 
-        for (const pattern of this.patterns) {
+        if (this.changeTimer >= 5) {
 
-            const bullets = pattern.update(deltaTime);
+            this.changeTimer = 0;
+
+            this.currentPattern =
+                this.getRandomPattern();
 
             console.log(
-                pattern.constructor.name,
-                bullets.length
+                "패턴 변경:",
+                this.currentPattern.constructor.name
             );
-
-            spawned.push(...bullets);
         }
 
-        return spawned;
+        return this.currentPattern.update(
+            deltaTime
+        );
     }
 }
