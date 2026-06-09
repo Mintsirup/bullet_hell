@@ -1,5 +1,6 @@
 import RainPattern from "../patterns/RainPattern.js";
 import CirclePattern from "../patterns/CirclePattern.js";
+import SpinPattern from "../patterns/SpinPattern.js";
 
 export default class Phase4 {
 
@@ -7,7 +8,7 @@ export default class Phase4 {
 
         this.patterns = [
             new CirclePattern(boss),
-            new RainPattern(canvas)
+            new SpinPattern(boss)
         ];
     }
 

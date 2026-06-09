@@ -6,7 +6,7 @@ export default class Player {
         this.keys = keys;
         this.canvas = canvas;
 
-        this.radius = 20;
+        this.radius = 10;
         this.speed = 400;
         this.hp = 100;
     }
