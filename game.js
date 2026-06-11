@@ -144,8 +144,8 @@ function loop(currentTime) {
     player.checkHits(bullets);
 
     if (player.hp <= 0) {
-        alert("게임 오버!");
-        location.reload();
+        alert("게입 오버!")
+        location.href = "index.html";
     }
 
     ctx.fillStyle = "white";
