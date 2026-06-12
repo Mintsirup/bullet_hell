@@ -81,7 +81,7 @@ const boss = new Boss(
     100
 );
 
-let phase = new Phase1(canvas, boss);
+let phase = new Phase1(boss);
 
 const player = new Player(
     canvas.width / 2,

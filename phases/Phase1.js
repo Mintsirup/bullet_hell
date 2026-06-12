@@ -1,14 +1,12 @@
 import CirclePattern from "../patterns/CirclePattern.js";
-import WallPattern from "../patterns/WallPattern.js";
 
 import boss from "../boss.js"
 
 export default class Phase1 {
 
-    constructor(canvas, boss) {
+    constructor(boss) {
 
         this.patterns = [
-            new WallPattern(canvas),
             new CirclePattern(boss)
         ];
     }
