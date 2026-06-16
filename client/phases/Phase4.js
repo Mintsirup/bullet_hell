@@ -21,11 +21,6 @@ export default class Phase4 {
 
             const bullets = pattern.update(deltaTime);
 
-            console.log(
-                pattern.constructor.name,
-                bullets.length
-            );
-
             spawned.push(...bullets);
         }
 

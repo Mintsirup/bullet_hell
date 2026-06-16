@@ -11,11 +11,6 @@ export default class WallPattern {
     }
 
     update(deltaTime) {
-
-        console.log(
-            "WALL UPDATE"
-        );
-
         this.timer += deltaTime;
 
         const spawned = [];
@@ -32,11 +27,6 @@ export default class WallPattern {
                 Math.floor(
                     this.rng.next() * columns
                 );
-
-            console.log(
-                "WALL GAP",
-                gap
-            );
 
             const spacing =
                 this.canvas.width / columns;

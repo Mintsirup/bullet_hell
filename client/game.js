@@ -15,6 +15,12 @@ import Phase4 from "./phases/Phase4.js";
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
+const GAME_WIDTH = 1280;
+const GAME_HEIGHT = 720;
+
+canvas.width = GAME_WIDTH;
+canvas.height = GAME_HEIGHT;
+
 // 키 입역 전역 관리
 const keys = {};
 
@@ -128,12 +134,8 @@ let accumulator = 0;
 // 총알 전역 관리
 const bullets = [];
 
-// 캔버스 크기 설정
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
 const boss = new Boss(
-    canvas.width / 2,
+    GAME_WIDTH / 2,
     100
 );
 
@@ -144,12 +146,33 @@ let lastTime = 0;
 let gameEnded = false;
 
 const player = new Player(
-    canvas.width / 2,
-    canvas.height / 2,
+    GAME_WIDTH / 2,
+    GAME_HEIGHT / 2,
     keys,
     canvas,
     gameStats
 );
+
+function resize() {
+
+    const scale = Math.min(
+        window.innerWidth / GAME_WIDTH,
+        window.innerHeight / GAME_HEIGHT
+    );
+
+    canvas.style.width =
+        `${GAME_WIDTH * scale}px`;
+
+    canvas.style.height =
+        `${GAME_HEIGHT * scale}px`;
+}
+
+window.addEventListener(
+    "resize",
+    resize
+);
+
+resize();
 
 async function finishGame() {
 

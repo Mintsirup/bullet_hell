@@ -32,11 +32,6 @@ export default class Phase3 {
                 patterns.length
             );
 
-        console.log(
-            "PATTERN RNG",
-            random
-        );
-
         return patterns[random]();
     }
 
@@ -50,11 +45,6 @@ export default class Phase3 {
 
             this.currentPattern =
                 this.getRandomPattern();
-
-            console.log(
-                "패턴 변경:",
-                this.currentPattern.constructor.name
-            );
         }
 
         return this.currentPattern.update(

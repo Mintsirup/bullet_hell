@@ -26,11 +26,6 @@ export default class RainPattern {
                     this.rng.next() *
                     this.canvas.width;
 
-                console.log(
-                    "RAIN X",
-                    x
-                );
-
                 spawned.push(
                     new Bullet(
                         x,

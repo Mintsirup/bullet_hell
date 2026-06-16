@@ -18,7 +18,7 @@ export default class SpinPattern {
 
             this.timer = 0;
 
-            const count = 2;
+            const count = 3;
 
             for (let i = 0; i < count; i++) {
 
