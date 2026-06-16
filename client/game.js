@@ -176,22 +176,39 @@ resize();
 
 async function finishGame() {
 
-    console.log({
-        survivedTime:
-            gameStats.survivedTime,
+    const debug = calculateScore(
+        gameStats,
+        player
+    );
 
-        phase4Time:
-            gameStats.phase4Time,
+    alert(
+        JSON.stringify(
+            {
+                survivedTime:
+                    gameStats.survivedTime,
 
-        bulletsSpawned:
-            gameStats.bulletsSpawned,
+                phase4Time:
+                    gameStats.phase4Time,
 
-        bulletsHit:
-            gameStats.bulletsHit,
+                bulletsSpawned:
+                    gameStats.bulletsSpawned,
 
-        hp:
-            player.hp
-    });
+                bulletsHit:
+                    gameStats.bulletsHit,
+
+                hp:
+                    player.hp,
+
+                score:
+                    debug.score,
+
+                rank:
+                    debug.rank
+            },
+            null,
+            2
+        )
+    );
 
     if (gameEnded) return;
 
