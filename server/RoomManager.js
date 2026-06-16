@@ -121,22 +121,17 @@ export default class RoomManager {
         );
     }
 
-    startRoom(
-        roomId
-    ) {
-
-        console.log(
-            "START ROOM CALLED",
-            roomId
-        );
+    startRoom(roomId) {
 
         const room =
             this.rooms.get(
                 roomId
             );
 
-        if (!room)
-            return false;
+        console.log(
+            "STARTING",
+            roomId
+        );
 
         room.started = true;
 

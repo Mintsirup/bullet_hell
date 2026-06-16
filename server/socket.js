@@ -200,6 +200,11 @@ wss.on(
                             roomId
                         );
 
+                        console.log(
+                            "ROOM CREATED",
+                            roomId
+                        );
+
                         break;
                     }
 
@@ -276,8 +281,35 @@ wss.on(
                                 data.roomId
                             );
 
+                        if (
+                            room.players.length < 2
+                        ) {
+
+                            send(
+                                ws,
+                                {
+                                    type:
+                                        "error",
+
+                                    message:
+                                        "최소 2명 필요"
+                                }
+                            );
+
+                            break;
+                        }
+
+                        rooms.startRoom(
+                            data.roomId
+                        );
+
                         room.players.forEach(
                             player => {
+
+                                console.log(
+                                    "SEND GAMESTART TO",
+                                    player.id
+                                );
 
                                 const client =
 
@@ -299,6 +331,13 @@ wss.on(
                                     }
                                 );
                             }
+
+                        );
+
+                        console.log(
+                            "START ROOM",
+                            roomId,
+                            room.started
                         );
 
                         break;
