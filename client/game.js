@@ -176,6 +176,23 @@ resize();
 
 async function finishGame() {
 
+    console.log({
+        survivedTime:
+            gameStats.survivedTime,
+
+        phase4Time:
+            gameStats.phase4Time,
+
+        bulletsSpawned:
+            gameStats.bulletsSpawned,
+
+        bulletsHit:
+            gameStats.bulletsHit,
+
+        hp:
+            player.hp
+    });
+
     if (gameEnded) return;
 
     gameEnded = true;
@@ -202,6 +219,13 @@ async function finishGame() {
                         gameStats.bulletsSpawned -
                         gameStats.bulletsHit
                 })
+            );
+
+            console.log(
+                calculateScore(
+                    gameStats,
+                    player
+                )
             );
 
             location.href =
