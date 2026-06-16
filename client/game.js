@@ -150,7 +150,29 @@ async function finishGame() {
 
     gameEnded = true;
 
-    if (replayMode) {
+        if (replayMode) {
+
+        sessionStorage.setItem(
+            "result",
+            JSON.stringify({
+
+                score: 0,
+                rank: "REPLAY",
+
+                survivedTime:
+                    gameStats.survivedTime,
+
+                bulletsSpawned:
+                    gameStats.bulletsSpawned,
+
+                bulletsHit:
+                    gameStats.bulletsHit,
+
+                bulletsDodged:
+                    gameStats.bulletsSpawned -
+                    gameStats.bulletsHit
+            })
+        );
 
         location.href =
             "result.html";
@@ -190,33 +212,7 @@ async function finishGame() {
             )
         );
 
-    } else {
-
-        sessionStorage.setItem(
-            "result",
-            JSON.stringify({
-
-                score: 0,
-                rank: "REPLAY",
-
-                survivedTime:
-                    gameStats.survivedTime,
-
-                bulletsSpawned:
-                    gameStats.bulletsSpawned,
-
-                bulletsHit:
-                    gameStats.bulletsHit,
-
-                bulletsDodged:
-                    gameStats.bulletsSpawned -
-                    gameStats.bulletsHit
-            })
-        );
     }
-
-    location.href =
-        "result.html";
 }
 
 // 게임 진행하는 부분

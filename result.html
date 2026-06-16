@@ -143,14 +143,18 @@ document
     }
 );
 
-const result =
-    JSON.parse(
-        sessionStorage.getItem(
-            "result"
-        )
+const raw =
+    sessionStorage.getItem(
+        "result"
     );
 
-    console.log(result);
+console.log(
+    "RAW RESULT =",
+    raw
+);
+
+const result =
+    JSON.parse(raw);
 
 document
 .getElementById("rank")
