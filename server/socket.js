@@ -13,7 +13,7 @@ const rooms =
 const clients =
     new Map();
 
-const wss =
+export const wss =
     new WebSocketServer({
         host: "0.0.0.0",
         port: 23334

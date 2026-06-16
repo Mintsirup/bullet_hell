@@ -1,7 +1,8 @@
 import express from "express";
 import cors from "cors";
 import path from "path";
-import "./socket.js";
+import { wss }
+from "./socket.js";
 import { fileURLToPath } from "url";
 
 import verifyReplay from "./verifyReplay.js";
@@ -45,9 +46,7 @@ function broadcastLeaderboard() {
                 client.readyState === 1
             ) {
 
-                client.send(
-                    data
-                );
+                client.send(data);
             }
         }
     );
