@@ -102,17 +102,24 @@ if (!replayMode) {
 
 let replayIndex = 0;
 
-const replayInput =
+let replayInput = [];
 
-    replayMode
+if (replayMode) {
 
-        ? JSON.parse(
-            sessionStorage.getItem(
-                "replayData"
-            )
-        ) || []
+    try {
 
-        : [];
+        replayInput =
+            JSON.parse(
+                sessionStorage.getItem(
+                    "replayData"
+                ) || "[]"
+            );
+
+    } catch {
+
+        replayInput = [];
+    }
+}
 
 const FIXED_DELTA = 1 / 60;
 
