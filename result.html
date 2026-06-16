@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+
+<meta charset="UTF-8">
+
+<title>Result</title>
+
+<style>
+
+body {
+
+    background: black;
+    color: white;
+
+    font-family: Arial;
+
+    text-align: center;
+
+    margin-top: 80px;
+}
+
+.score {
+
+    font-size: 50px;
+}
+
+.rank {
+
+    font-size: 80px;
+
+    color: gold;
+}
+
+button {
+
+    margin-top: 30px;
+
+    font-size: 24px;
+
+    padding: 10px 30px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>RESULT</h1>
+
+<div
+    id="rank"
+    class="rank"
+></div>
+
+<div
+    id="score"
+    class="score"
+></div>
+
+<p id="spawned"></p>
+
+<p id="hit"></p>
+
+<p id="dodged"></p>
+
+<button id="replay">
+    Replay
+</button>
+
+<button id="saveReplay">
+    리플레이 저장
+</button>
+
+<button id="go_to_main">
+    main menu
+</button>
+
+<script>
+
+document
+.getElementById(
+    "saveReplay"
+)
+.addEventListener(
+    "click",
+    () => {
+
+        const result =
+            JSON.parse(
+                sessionStorage.getItem(
+                    "result"
+                )
+            );
+
+        const blob =
+            new Blob(
+                [
+                    JSON.stringify(
+                        result,
+                        null,
+                        4
+                    )
+                ],
+                {
+                    type:
+                    "application/json"
+                }
+            );
+
+        const url =
+            URL.createObjectURL(
+                blob
+            );
+
+        const a =
+            document.createElement(
+                "a"
+            );
+
+        a.href = url;
+
+        a.download =
+            `replay_${Date.now()}.json`;
+
+        a.click();
+
+        URL.revokeObjectURL(
+            url
+        );
+    }
+);
+
+document
+.getElementById("go_to_main")
+.addEventListener(
+    "click",
+    () => {
+
+        location.href =
+            "index.html";
+    }
+);
+
+const result =
+    JSON.parse(
+        sessionStorage.getItem(
+            "result"
+        )
+    );
+
+    console.log(result);
+
+document
+.getElementById("rank")
+.textContent =
+    result.rank;
+
+document
+.getElementById("score")
+.textContent =
+    result.score.toLocaleString()
+    + " / 1,000,000";
+
+document
+.getElementById("spawned")
+.textContent =
+    "생성된 탄막: "
+    + result.bulletsSpawned;
+
+document
+.getElementById("hit")
+.textContent =
+    "맞은 횟수: "
+    + result.bulletsHit;
+
+document
+.getElementById("dodged")
+.textContent =
+    "피한 탄막: "
+    + result.bulletsDodged;
+
+document
+.getElementById("replay")
+.addEventListener(
+    "click",
+    () => {
+
+        sessionStorage.setItem(
+            "replayData",
+            JSON.stringify(
+                result.replayData
+            )
+        );
+
+            sessionStorage.setItem(
+                "replaySeed",
+                result.seed
+            );
+
+                location.href =
+                "game.html?replay=1";
+    }
+);
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Bullet Hell</title>
+
+    <style>
+        body {
+            margin: 0;
+            background: black;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            height: 100vh;
+            flex-direction: column;
+
+            color: white;
+            font-family: Arial;
+        }
+
+        h1 {
+            font-size: 80px;
+        }
+
+        button {
+            width: 250px;
+            height: 60px;
+
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        input {
+
+            width: 250px;
+            height: 40px;
+
+            font-size: 20px;
+
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Bullet Hell</h1>
+
+    <input
+        type="text"
+        id="nickname"
+        placeholder="닉네임 입력"
+    />
+
+    <button id="startButton">
+        game start
+    </button>
+
+    <button id="loadReplayBtn">
+        리플레이 불러오기
+    </button>
+
+    <button id="leaderboardBtn">
+        leaderboard
+    </button>
+
+    <input
+        type="file"
+        id="loadReplay"
+        accept=".json"
+        hidden
+    >
+
+    <script>
+
+        document
+        .getElementById(
+            "leaderboardBtn"
+        )
+        .addEventListener(
+            "click",
+            () => {
+
+                location.href =
+                    "leaderboard.html";
+            }
+        );
+
+        document
+        .getElementById(
+            "loadReplayBtn"
+        )
+        .addEventListener(
+            "click",
+            () => {
+
+                document
+                .getElementById(
+                    "loadReplay"
+                )
+                .click();
+            }
+        );
+
+        document
+        .getElementById(
+            "loadReplay"
+        )
+        .addEventListener(
+            "change",
+            e => {
+
+                const file =
+                    e.target.files[0];
+
+                if (!file) return;
+
+                const reader =
+                    new FileReader();
+
+                reader.onload =
+                    () => {
+
+                        const replay =
+                            JSON.parse(
+                                reader.result
+                            );
+
+                        sessionStorage.setItem(
+                            "replayData",
+                            JSON.stringify(
+                                replay.replayData
+                            )
+                        );
+
+                        sessionStorage.setItem(
+                            "replaySeed",
+                            replay.seed
+                        );
+
+                        location.href =
+                            "game.html?replay=1";
+                    };
+
+                reader.readAsText(
+                    file
+                );
+            }
+        );
+
+        document
+        .getElementById("startButton")
+        .addEventListener(
+            "click",
+            () => {
+
+                const nickname =
+                    document
+                    .getElementById(
+                        "nickname"
+                    )
+                    .value
+                    .trim();
+
+                sessionStorage.setItem(
+                    "nickname",
+                    nickname || "Anonymous"
+                );
+
+                location.href =
+                    "game.html";
+            }
+        );
+    </script>
+
+</body>
+</html>
