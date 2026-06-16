@@ -152,33 +152,33 @@ async function finishGame() {
 
         if (replayMode) {
 
-        sessionStorage.setItem(
-            "result",
-            JSON.stringify({
+            sessionStorage.setItem(
+                "result",
+                JSON.stringify({
 
-                score: 0,
-                rank: "REPLAY",
+                    score: 0,
+                    rank: "REPLAY",
 
-                survivedTime:
-                    gameStats.survivedTime,
+                    survivedTime:
+                        gameStats.survivedTime,
 
-                bulletsSpawned:
-                    gameStats.bulletsSpawned,
+                    bulletsSpawned:
+                        gameStats.bulletsSpawned,
 
-                bulletsHit:
-                    gameStats.bulletsHit,
+                    bulletsHit:
+                        gameStats.bulletsHit,
 
-                bulletsDodged:
-                    gameStats.bulletsSpawned -
-                    gameStats.bulletsHit
-            })
-        );
+                    bulletsDodged:
+                        gameStats.bulletsSpawned -
+                        gameStats.bulletsHit
+                })
+            );
 
-        location.href =
-            "result.html";
+            location.href =
+                "result.html";
 
-        return;
-    }
+            return;
+        }
 
     if (!replayMode) {
 
@@ -211,6 +211,8 @@ async function finishGame() {
                 data.result
             )
         );
+
+        location.href = "result.html";
 
     }
 }
