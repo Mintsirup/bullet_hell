@@ -21,9 +21,9 @@ export function calculateScore(
 
     const survivalScore =
         Math.min(
-            gameStats.phase4Time / 180,
+            gameStats.survivedTime / 180,
             1
-        ) * 500000;
+        ) * 400000;
 
     const dodgeRate =
         gameStats.bulletsSpawned > 0
@@ -32,11 +32,11 @@ export function calculateScore(
             : 0;
 
     const dodgeScore =
-        dodgeRate * 400000;
+        dodgeRate * 300000;
 
     const hpScore =
         (player.hp / player.maxHp)
-        * 100000;
+        * 300000;
 
     const score =
         Math.floor(
