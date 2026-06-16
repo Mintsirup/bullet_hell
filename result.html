@@ -255,39 +255,6 @@ transform:
 
 <script>
 
-const rankElement =
-    document.getElementById("rank");
-
-rankElement.textContent =
-    result.rank;
-
-switch (result.rank) {
-
-    case "S":
-        rankElement.style.color =
-            "#ffd700";
-        break;
-
-    case "A":
-        rankElement.style.color =
-            "#00ffff";
-        break;
-
-    case "B":
-        rankElement.style.color =
-            "#66ff66";
-        break;
-
-    case "C":
-        rankElement.style.color =
-            "#ff9933";
-        break;
-
-    default:
-        rankElement.style.color =
-            "#ff4444";
-}
-
 document
 .getElementById(
     "saveReplay"
@@ -416,6 +383,39 @@ document
                 "game.html?replay=1";
     }
 );
+
+const rankElement =
+    document.getElementById("rank");
+
+rankElement.textContent =
+    result.rank;
+
+switch (result.rank) {
+
+    case "S":
+        rankElement.style.color =
+            "#ffd700";
+        break;
+
+    case "A":
+        rankElement.style.color =
+            "#00ffff";
+        break;
+
+    case "B":
+        rankElement.style.color =
+            "#66ff66";
+        break;
+
+    case "C":
+        rankElement.style.color =
+            "#ff9933";
+        break;
+
+    default:
+        rankElement.style.color =
+            "#ff4444";
+}
 
 </script>
 
