@@ -370,44 +370,6 @@ function drawGame() {
         bullet.draw(ctx);
     }
 
-    for (
-        const p of
-        otherPlayers.values()
-    ) {
-
-        if (
-            p.x == null ||
-            p.y == null
-        ) continue;
-
-        ctx.fillStyle =
-            "cyan";
-
-        ctx.beginPath();
-
-        ctx.arc(
-            p.x,
-            p.y,
-            15,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-
-        ctx.fillStyle =
-            "white";
-
-        ctx.font =
-            "16px Arial";
-
-        ctx.fillText(
-            p.name,
-            p.x - 20,
-            p.y - 25
-        );
-    }
-
     if (replayMode) {
 
         const replayName =
