@@ -15,6 +15,7 @@ const clients =
 
 const wss =
     new WebSocketServer({
+        host: "0.0.0.0",
         port: 23334
     });
 
