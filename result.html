@@ -10,35 +10,196 @@
 
 body {
 
-    background: black;
-    color: white;
 
-    font-family: Arial;
+margin: 0;
 
-    text-align: center;
+width: 100vw;
+height: 100vh;
 
-    margin-top: 80px;
+display: flex;
+justify-content: center;
+align-items: center;
+
+background:
+    radial-gradient(
+        circle at center,
+        #1a1a2e 0%,
+        #0a0a12 60%,
+        #000 100%
+    );
+
+color: white;
+
+font-family:
+    "Segoe UI",
+    sans-serif;
+
+overflow: hidden;
+
+
 }
 
-.score {
+#container {
 
-    font-size: 50px;
+
+width: 700px;
+
+padding: 40px;
+
+border-radius: 25px;
+
+background:
+    rgba(0,0,0,0.75);
+
+backdrop-filter: blur(10px);
+
+border:
+    2px solid cyan;
+
+box-shadow:
+    0 0 20px #00ffff55,
+    0 0 80px #00ffff22;
+
+text-align: center;
+
+
+}
+
+h1 {
+
+
+margin-top: 0;
+
+font-size: 50px;
+
+color: cyan;
+
+letter-spacing: 5px;
+
+text-shadow:
+    0 0 15px cyan;
+
+
 }
 
 .rank {
 
-    font-size: 80px;
 
-    color: gold;
+font-size: 120px;
+
+font-weight: bold;
+
+margin: 10px 0;
+
+text-shadow:
+    0 0 25px gold;
+
+
+}
+
+.score {
+
+
+font-size: 55px;
+
+color: white;
+
+margin-bottom: 30px;
+
+
+}
+
+.stats {
+
+
+display: flex;
+
+flex-direction: column;
+
+gap: 12px;
+
+margin-bottom: 30px;
+
+font-size: 22px;
+
+
+}
+
+.stats div {
+
+
+background:
+    rgba(255,255,255,0.05);
+
+padding: 12px;
+
+border-radius: 10px;
+
+
+}
+
+.buttons {
+
+
+display: flex;
+
+flex-direction: column;
+
+gap: 12px;
+
+
 }
 
 button {
 
-    margin-top: 30px;
 
-    font-size: 24px;
+height: 55px;
 
-    padding: 10px 30px;
+border: none;
+
+border-radius: 12px;
+
+background:
+    linear-gradient(
+        135deg,
+        #00ffff,
+        #0088ff
+    );
+
+color: white;
+
+font-size: 20px;
+
+font-weight: bold;
+
+cursor: pointer;
+
+transition:
+    transform .15s,
+    box-shadow .15s;
+
+
+}
+
+button:hover {
+
+
+transform:
+    translateY(-2px);
+
+box-shadow:
+    0 0 20px #00ffff88;
+
+
+}
+
+button:active {
+
+
+transform:
+    scale(0.97);
+
+
 }
 
 </style>
@@ -47,37 +208,85 @@ button {
 
 <body>
 
+<div id="container">
+
+
 <h1>RESULT</h1>
 
 <div
     id="rank"
-    class="rank"
-></div>
+    class="rank">
+</div>
 
 <div
     id="score"
-    class="score"
-></div>
+    class="score">
+</div>
 
-<p id="spawned"></p>
+<div class="stats">
 
-<p id="hit"></p>
+    <div id="spawned"></div>
 
-<p id="dodged"></p>
+    <div id="hit"></div>
 
-<button id="replay">
-    Replay
-</button>
+    <div id="dodged"></div>
 
-<button id="saveReplay">
-    리플레이 저장
-</button>
+</div>
 
-<button id="go_to_main">
-    main menu
-</button>
+<div class="buttons">
+
+    <button id="replay">
+        ▶ Replay
+    </button>
+
+    <button id="saveReplay">
+        💾 Save Replay
+    </button>
+
+    <button id="go_to_main">
+        🏠 Main Menu
+    </button>
+
+</div>
+
+
+</div>
+
 
 <script>
+
+const rankElement =
+    document.getElementById("rank");
+
+rankElement.textContent =
+    result.rank;
+
+switch (result.rank) {
+
+    case "S":
+        rankElement.style.color =
+            "#ffd700";
+        break;
+
+    case "A":
+        rankElement.style.color =
+            "#00ffff";
+        break;
+
+    case "B":
+        rankElement.style.color =
+            "#66ff66";
+        break;
+
+    case "C":
+        rankElement.style.color =
+            "#ff9933";
+        break;
+
+    default:
+        rankElement.style.color =
+            "#ff4444";
+}
 
 document
 .getElementById(
