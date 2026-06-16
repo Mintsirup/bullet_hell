@@ -1,6 +1,6 @@
 const socket =
     new WebSocket(
-        "ws://${window.location.hostname}:23334"
+        `ws://${window.location.hostname}:23334`
     );
 
 const roomId =
