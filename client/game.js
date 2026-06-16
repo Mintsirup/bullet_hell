@@ -24,6 +24,11 @@ const socket =
     );
 
 const roomId =
+    new URLSearchParams(
+        location.search
+    ).get("room");
+
+const roomId =
     sessionStorage.getItem(
         "roomId"
     );
@@ -66,6 +71,20 @@ event => {
 
             myId =
                 data.playerId;
+
+            break;
+
+        case "roomFinished":
+
+            sessionStorage.setItem(
+                "roomResults",
+                JSON.stringify(
+                    data.results
+                )
+            );
+
+            location.href =
+                "roomResult.html";
 
             break;
 
@@ -230,6 +249,27 @@ async function finishGame() {
 
     gameEnded = true;
 
+    socket.send(
+        JSON.stringify({
+
+            type:
+                "submitResult",
+
+            roomId,
+
+            name:
+                sessionStorage.getItem(
+                    "nickname"
+                ),
+
+            score:
+                data.result.score,
+
+            rank:
+                data.result.rank
+        })
+    );
+
         if (replayMode) {
 
             sessionStorage.setItem(
@@ -285,14 +325,40 @@ async function finishGame() {
         const data =
             await response.json();
 
+        if (roomId) {
+
+            socket.send(
+                JSON.stringify({
+
+                    type:
+                        "submitResult",
+
+                    roomId,
+
+                    name:
+                        sessionStorage.getItem(
+                            "nickname"
+                        ),
+
+                    score:
+                        data.result.score,
+
+                    rank:
+                        data.result.rank
+                })
+            );
+
+            return;
+        }
+
+        location.href = "result.html";
+
         sessionStorage.setItem(
             "result",
             JSON.stringify(
                 data.result
             )
         );
-
-        location.href = "result.html";
 
     }
 }

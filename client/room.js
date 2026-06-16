@@ -72,6 +72,14 @@ event => {
 
             break;
 
+        case "error":
+
+            alert(
+                data.message
+            );
+
+            break;
+
         case "gameStart":
 
             console.log(

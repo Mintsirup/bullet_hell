@@ -291,6 +291,28 @@ wss.on(
                                 data.roomId
                             );
 
+                        if (!room)
+                            break;
+
+                        if (
+                            room.hostId !==
+                            playerId
+                        ) {
+
+                            send(
+                                ws,
+                                {
+                                    type:
+                                        "error",
+
+                                    message:
+                                        "방장만 시작 가능"
+                                }
+                            );
+
+                            break;
+                        }
+
                         if (
                             room.players.length < 2
                         ) {
