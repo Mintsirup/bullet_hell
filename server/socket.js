@@ -145,6 +145,21 @@ wss.on(
                     data.type
                 ) {
 
+                    case "identify": {
+
+                        clients.set(
+                            data.playerId,
+                            ws
+                        );
+
+                        console.log(
+                            "IDENTIFIED",
+                            data.playerId
+                        );
+
+                        break;
+                    }
+
                     case "playerUpdate": {
 
                         const room =
@@ -320,6 +335,9 @@ wss.on(
                                     "CLIENT EXISTS?",
                                     !!client
                                 );
+
+                                if (!client)
+                                    return;
 
                                 send(
                                     client,

@@ -27,6 +27,19 @@ socket.onopen =
         JSON.stringify({
 
             type:
+                "identify",
+
+            playerId:
+                sessionStorage.getItem(
+                    "playerId"
+                )
+        })
+    );
+
+    socket.send(
+        JSON.stringify({
+
+            type:
                 "getRoom",
 
             roomId

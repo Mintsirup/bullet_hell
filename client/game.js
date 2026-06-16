@@ -33,6 +33,23 @@ const otherPlayers =
 
 let myId = null;
 
+socket.onopen =
+() => {
+
+    socket.send(
+        JSON.stringify({
+
+            type:
+                "identify",
+
+            playerId:
+                sessionStorage.getItem(
+                    "playerId"
+                )
+        })
+    );
+};
+
 socket.onmessage =
 event => {
 
