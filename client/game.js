@@ -28,11 +28,6 @@ const roomId =
         location.search
     ).get("room");
 
-const roomId =
-    sessionStorage.getItem(
-        "roomId"
-    );
-
 const otherPlayers =
     new Map();
 
