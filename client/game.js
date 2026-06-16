@@ -399,6 +399,7 @@ function updateGame(deltaTime) {
         player.hp <= 0
     ) {
 
+        console.trace("finishGame called");
         finishGame();
         return;
     }

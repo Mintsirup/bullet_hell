@@ -1,6 +1,6 @@
 export function getRank(score) {
 
-```
+
 if (score >= 1000000) return "S+";
 if (score >= 900000) return "S";
 if (score >= 800000) return "A";
@@ -9,7 +9,7 @@ if (score >= 500000) return "C";
 if (score >= 300000) return "D";
 
 return "F";
-```
+
 
 }
 
