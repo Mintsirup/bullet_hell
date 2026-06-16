@@ -18,93 +18,6 @@ const ctx = canvas.getContext("2d");
 // 키 입역 전역 관리
 const keys = {};
 
-const socket =
-    new WebSocket(
-        `ws://${location.hostname}:23334`
-    );
-
-const roomId =
-    new URLSearchParams(
-        location.search
-    ).get("room");
-
-const otherPlayers =
-    new Map();
-
-let myId = null;
-
-socket.onopen =
-() => {
-
-    socket.send(
-        JSON.stringify({
-
-            type:
-                "identify",
-
-            playerId:
-                sessionStorage.getItem(
-                    "playerId"
-                )
-        })
-    );
-};
-
-socket.onmessage =
-event => {
-
-    const data =
-        JSON.parse(
-            event.data
-        );
-
-    switch (
-        data.type
-    ) {
-
-        case "connected":
-
-            myId =
-                data.playerId;
-
-            break;
-
-        case "roomFinished":
-
-            sessionStorage.setItem(
-                "roomResults",
-                JSON.stringify(
-                    data.results
-                )
-            );
-
-            location.href =
-                "roomResult.html";
-
-            break;
-
-        case "players":
-
-            data.players.forEach(
-                p => {
-
-                    if (
-                        p.id !==
-                        myId
-                    ) {
-
-                        otherPlayers.set(
-                            p.id,
-                            p
-                        );
-                    }
-                }
-            );
-
-            break;
-    }
-};
-
 // 리플레이
 const replayMode =
     new URLSearchParams(
@@ -244,27 +157,6 @@ async function finishGame() {
 
     gameEnded = true;
 
-    socket.send(
-        JSON.stringify({
-
-            type:
-                "submitResult",
-
-            roomId,
-
-            name:
-                sessionStorage.getItem(
-                    "nickname"
-                ),
-
-            score:
-                data.result.score,
-
-            rank:
-                data.result.rank
-        })
-    );
-
         if (replayMode) {
 
             sessionStorage.setItem(
@@ -319,32 +211,6 @@ async function finishGame() {
 
         const data =
             await response.json();
-
-        if (roomId) {
-
-            socket.send(
-                JSON.stringify({
-
-                    type:
-                        "submitResult",
-
-                    roomId,
-
-                    name:
-                        sessionStorage.getItem(
-                            "nickname"
-                        ),
-
-                    score:
-                        data.result.score,
-
-                    rank:
-                        data.result.rank
-                })
-            );
-
-            return;
-        }
 
         location.href = "result.html";
 
@@ -460,37 +326,6 @@ function updateGame(deltaTime) {
             continue;
         }
     }
-
-    if (
-        roomId &&
-        socket.readyState ===
-        WebSocket.OPEN
-    ) {
-
-        socket.send(
-            JSON.stringify({
-
-                type:
-                    "playerUpdate",
-
-                roomId,
-
-                x:
-                    player.x,
-
-                y:
-                    player.y,
-
-                hp:
-                    player.hp
-            })
-        );
-    }
-
-    console.log(
-        "SOCKET STATE",
-        socket.readyState
-    );
 
     player.checkHits(
         bullets

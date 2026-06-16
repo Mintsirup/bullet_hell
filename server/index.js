@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 import path from "path";
-import { wss } from "./socket.js";
 import { fileURLToPath } from "url";
 
 import verifyReplay from "./verifyReplay.js";
