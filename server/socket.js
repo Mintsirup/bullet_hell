@@ -312,18 +312,14 @@ wss.on(
                                 );
 
                                 console.log(
+                                    "PLAYER",
+                                    player.id
+                                );
+
+                                console.log(
                                     "CLIENT EXISTS?",
                                     !!client
                                 );
-
-                                const client =
-
-                                    clients.get(
-                                        player.id
-                                    );
-
-                                if (!client)
-                                    return;
 
                                 send(
                                     client,
