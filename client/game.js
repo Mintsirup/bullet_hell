@@ -18,14 +18,14 @@ const ctx = canvas.getContext("2d");
 // 키 입역 전역 관리
 const keys = {};
 
-const roomId =
-    sessionStorage.getItem(
-        "roomId"
-    );
-
 const socket =
     new WebSocket(
         `ws://${location.hostname}:23334`
+    );
+
+const roomId =
+    sessionStorage.getItem(
+        "roomId"
     );
 
 const otherPlayers =
@@ -400,7 +400,11 @@ function updateGame(deltaTime) {
         }
     }
 
-    if (roomId) {
+    if (
+        roomId &&
+        socket.readyState ===
+        WebSocket.OPEN
+    ) {
 
         socket.send(
             JSON.stringify({
@@ -421,6 +425,11 @@ function updateGame(deltaTime) {
             })
         );
     }
+
+    console.log(
+        "SOCKET STATE",
+        socket.readyState
+    );
 
     player.checkHits(
         bullets
