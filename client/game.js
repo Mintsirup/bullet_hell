@@ -18,6 +18,62 @@ const ctx = canvas.getContext("2d");
 // 키 입역 전역 관리
 const keys = {};
 
+const roomId =
+    sessionStorage.getItem(
+        "roomId"
+    );
+
+const socket =
+    new WebSocket(
+        `ws://${location.hostname}:23334`
+    );
+
+const otherPlayers =
+    new Map();
+
+let myId = null;
+
+socket.onmessage =
+event => {
+
+    const data =
+        JSON.parse(
+            event.data
+        );
+
+    switch (
+        data.type
+    ) {
+
+        case "connected":
+
+            myId =
+                data.playerId;
+
+            break;
+
+        case "players":
+
+            data.players.forEach(
+                p => {
+
+                    if (
+                        p.id !==
+                        myId
+                    ) {
+
+                        otherPlayers.set(
+                            p.id,
+                            p
+                        );
+                    }
+                }
+            );
+
+            break;
+    }
+};
+
 // 리플레이
 const replayMode =
     new URLSearchParams(
@@ -327,6 +383,28 @@ function updateGame(deltaTime) {
         }
     }
 
+    if (roomId) {
+
+        socket.send(
+            JSON.stringify({
+
+                type:
+                    "playerUpdate",
+
+                roomId,
+
+                x:
+                    player.x,
+
+                y:
+                    player.y,
+
+                hp:
+                    player.hp
+            })
+        );
+    }
+
     player.checkHits(
         bullets
     );
@@ -368,6 +446,44 @@ function drawGame() {
     ) {
 
         bullet.draw(ctx);
+    }
+
+    for (
+        const p of
+        otherPlayers.values()
+    ) {
+
+        if (
+            p.x == null ||
+            p.y == null
+        ) continue;
+
+        ctx.fillStyle =
+            "cyan";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            p.x,
+            p.y,
+            15,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+        ctx.fillStyle =
+            "white";
+
+        ctx.font =
+            "16px Arial";
+
+        ctx.fillText(
+            p.name,
+            p.x - 20,
+            p.y - 25
+        );
     }
 
     if (replayMode) {

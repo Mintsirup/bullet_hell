@@ -31,6 +31,49 @@ function send(
     );
 }
 
+setInterval(
+    () => {
+
+        for (
+            const room of
+            rooms.rooms.values()
+        ) {
+
+            const payload =
+                JSON.stringify({
+
+                    type:
+                        "players",
+
+                    players:
+                        room.players
+                });
+
+            room.players.forEach(
+                player => {
+
+                    const ws =
+                        clients.get(
+                            player.id
+                        );
+
+                    if (
+                        ws &&
+                        ws.readyState === 1
+                    ) {
+
+                        ws.send(
+                            payload
+                        );
+                    }
+                }
+            );
+        }
+
+    },
+    50
+);
+
 function broadcastRoom(
     roomId
 ) {
@@ -101,6 +144,37 @@ wss.on(
                 switch (
                     data.type
                 ) {
+
+                    case "playerUpdate": {
+
+                        const room =
+                            rooms.getRoom(
+                                data.roomId
+                            );
+
+                        if (!room)
+                            break;
+
+                        const player =
+                            room.players.find(
+                                p =>
+                                p.id === playerId
+                            );
+
+                        if (player) {
+
+                            player.x =
+                                data.x;
+
+                            player.y =
+                                data.y;
+
+                            player.hp =
+                                data.hp;
+                        }
+
+                        break;
+                    }
 
                     case
                     "createRoom": {
