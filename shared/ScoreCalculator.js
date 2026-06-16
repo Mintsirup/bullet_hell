@@ -1,57 +1,66 @@
 export function getRank(score) {
 
-    if (score === 1000000) return "S+";
-    if (score >= 950000) return "S";
-    if (score >= 850000) return "A";
-    if (score >= 700000) return "B";
-    if (score >= 500000) return "C";
-    if (score >= 300000) return "D";
+```
+if (score >= 1000000) return "S+";
+if (score >= 900000) return "S";
+if (score >= 800000) return "A";
+if (score >= 650000) return "B";
+if (score >= 500000) return "C";
+if (score >= 300000) return "D";
 
-    return "F";
+return "F";
+```
+
 }
 
 export function calculateScore(
-    gameStats,
-    player
+gameStats,
+player
 ) {
 
-    const bulletsDodged =
-        gameStats.bulletsSpawned -
-        gameStats.bulletsHit;
 
-    const survivalScore =
-        Math.min(
-            gameStats.survivedTime / 180,
-            1
-        ) * 400000;
+const bulletsDodged =
+    gameStats.bulletsSpawned -
+    gameStats.bulletsHit;
 
-    const dodgeRate =
-        gameStats.bulletsSpawned > 0
-            ? bulletsDodged /
-              gameStats.bulletsSpawned
-            : 0;
+const survivalRatio =
+    Math.min(
+        gameStats.survivedTime / 180,
+        1
+    );
 
-    const dodgeScore =
-        dodgeRate * 300000;
+const dodgeRatio =
+    gameStats.bulletsSpawned > 0
+        ? bulletsDodged /
+          gameStats.bulletsSpawned
+        : 0;
 
-    const hpScore =
-        (player.hp / player.maxHp)
-        * 300000;
+const survivalScore =
+    survivalRatio * 700000;
 
-    const score =
-        Math.floor(
-            survivalScore +
-            dodgeScore +
-            hpScore
-        );
+const hpScore =
+    (player.hp / player.maxHp)
+    * 150000;
 
-    return {
+const dodgeScore =
+    dodgeRatio * 150000;
 
-        score,
+const score =
+    Math.floor(
+        survivalScore +
+        hpScore +
+        dodgeScore
+    );
 
-        rank:
-            getRank(score),
+return {
 
-        bulletsDodged
-    };
+    score,
+
+    rank:
+        getRank(score),
+
+    bulletsDodged
+};
+
+
 }
