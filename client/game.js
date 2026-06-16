@@ -364,7 +364,7 @@ function updateGame(deltaTime) {
 
     if (
         gameStats.phase4Time >=
-        180
+        120
     ) {
 
         finishGame();
@@ -470,7 +470,7 @@ function drawGame() {
                 Math.floor(
                     gameStats.phase4Time
                 )
-            } / 180`,
+            } / 120`,
             20,
             120
         );
