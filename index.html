@@ -1,12 +1,27 @@
 <!DOCTYPE html>
+
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>Bullet Hell</title>
+<meta charset="UTF-8">
+<title>Bullet Hell</title>
 
-    <style>
-        body {
-    margin: 0;
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+
+    width:100vw;
+    height:100vh;
+
+    overflow:hidden;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
 
     background:
         radial-gradient(
@@ -16,35 +31,29 @@
             #000 100%
         );
 
-    color: white;
+    color:white;
 
     font-family:
         "Segoe UI",
         sans-serif;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    width: 100vw;
-    height: 100vh;
-
-    overflow: hidden;
 }
 
-#container {
+#container{
 
-    width: 380px;
+    width:420px;
 
-    padding: 30px;
+    padding:40px;
 
-    border-radius: 20px;
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+
+    border-radius:20px;
 
     background:
-        rgba(0, 0, 0, 0.7);
+        rgba(0,0,0,.7);
 
-    backdrop-filter:
-        blur(10px);
+    backdrop-filter:blur(10px);
 
     border:
         2px solid #00ffff;
@@ -52,67 +61,76 @@
     box-shadow:
         0 0 20px #00ffff55,
         0 0 60px #00ffff22;
-
-    display: flex;
-    flex-direction: column;
-
-    gap: 12px;
 }
 
-input {
+h1{
 
-    height: 48px;
+    margin:0 0 15px 0;
 
-    border: none;
+    text-align:center;
 
-    border-radius: 10px;
+    color:#00ffff;
 
-    padding: 0 15px;
+    font-size:42px;
 
-    background: #111;
-
-    color: white;
-
-    font-size: 18px;
-
-    outline: none;
+    letter-spacing:3px;
 }
 
-input:focus {
+p{
+
+    margin:0;
+
+    text-align:center;
+
+    color:#aaa;
+}
+
+input{
+
+    height:50px;
+
+    border:none;
+
+    border-radius:10px;
+
+    padding:0 15px;
+
+    background:#111;
+
+    color:white;
+
+    font-size:18px;
+
+    outline:none;
+}
+
+input:focus{
 
     box-shadow:
         0 0 10px cyan;
 }
 
-button {
+button{
 
-    height: 50px;
+    height:55px;
 
-    border: none;
+    border:none;
 
-    border-radius: 10px;
+    border-radius:10px;
 
-    background:
-        linear-gradient(
-            135deg,
-            #00ffff,
-            #0088ff
-        );
+    cursor:pointer;
 
-    color: white;
+    color:white;
 
-    font-size: 18px;
+    font-size:18px;
 
-    font-weight: bold;
-
-    cursor: pointer;
+    font-weight:bold;
 
     transition:
-        transform .15s,
-        box-shadow .15s;
+        .15s;
 }
 
-button:hover {
+button:hover{
 
     transform:
         translateY(-2px);
@@ -121,144 +139,207 @@ button:hover {
         0 0 20px #00ffff88;
 }
 
-button:active {
+button:active{
 
     transform:
-        scale(0.97);
+        scale(.97);
 }
-    </style>
+
+.primary{
+
+    background:
+        linear-gradient(
+            135deg,
+            #00ffff,
+            #0088ff
+        );
+}
+
+.secondary{
+
+    background:
+        linear-gradient(
+            135deg,
+            #444,
+            #222
+        );
+}
+
+#loadReplay{
+    display:none;
+}
+
+.version{
+
+    margin-top:10px;
+
+    text-align:center;
+
+    color:#666;
+
+    font-size:13px;
+}
+
+</style>
+
 </head>
 
 <body>
 
-    <h1>Bullet Hell</h1>
+<div id="container">
 
-    <input
-        type="text"
-        id="nickname"
-        placeholder="닉네임 입력"
-    />
+```
+<h1>BULLET HELL</h1>
 
-    <button id="startButton">
-        game start
-    </button>
+<p>S+가 되면 1만원을 얻을 수 있다고?!(선착순 1명 리플레이파일 필요)</p>
 
-    <button id="loadReplayBtn">
-        리플레이 불러오기
-    </button>
+<input
+    id="nickname"
+    placeholder="닉네임"
+>
 
-    <button id="leaderboardBtn">
-        leaderboard
-    </button>
+<button
+    id="startButton"
+    class="primary">
 
-    <input
-        type="file"
-        id="loadReplay"
-        accept=".json"
-        hidden
-    >
+    게임 시작
+</button>
 
-    <script>
+<button
+    id="leaderboardBtn"
+    class="secondary">
+
+    랭킹
+</button>
+
+<button
+    id="loadReplayBtn"
+    class="secondary">
+
+    리플레이 불러오기
+</button>
+
+<input
+    type="file"
+    id="loadReplay"
+    accept=".json"
+>
+
+<div class="version">
+    v1.0
+</div>
+```
+
+</div>
+
+<script>
+
+document
+.getElementById(
+    "startButton"
+)
+.onclick =
+() => {
+
+    const nickname =
 
         document
         .getElementById(
-            "leaderboardBtn"
+            "nickname"
         )
-        .addEventListener(
-            "click",
-            () => {
+        .value
+        .trim();
 
-                location.href =
-                    "leaderboard.html";
-            }
+    sessionStorage.setItem(
+        "nickname",
+        nickname || "Anonymous"
+    );
+
+    location.href =
+        "game.html";
+};
+
+document
+.getElementById(
+    "leaderboardBtn"
+)
+.onclick =
+() => {
+
+    location.href =
+        "leaderboard.html";
+};
+
+document
+.getElementById(
+    "loadReplayBtn"
+)
+.onclick =
+() => {
+
+    document
+    .getElementById(
+        "loadReplay"
+    )
+    .click();
+};
+
+document
+.getElementById(
+    "loadReplay"
+)
+.onchange =
+e => {
+
+    const file =
+        e.target.files[0];
+
+    if (!file)
+        return;
+
+    const reader =
+        new FileReader();
+
+    reader.onload =
+    () => {
+
+        const replay =
+            JSON.parse(
+                reader.result
+            );
+
+        sessionStorage.setItem(
+            "replayData",
+            JSON.stringify(
+                replay.replayData
+            )
         );
 
-        document
-        .getElementById(
-            "loadReplayBtn"
-        )
-        .addEventListener(
-            "click",
-            () => {
-
-                document
-                .getElementById(
-                    "loadReplay"
-                )
-                .click();
-            }
+        sessionStorage.setItem(
+            "replaySeed",
+            replay.seed
         );
 
-        document
-        .getElementById(
-            "loadReplay"
-        )
-        .addEventListener(
-            "change",
-            e => {
-
-                const file =
-                    e.target.files[0];
-
-                if (!file) return;
-
-                const reader =
-                    new FileReader();
-
-                reader.onload =
-                    () => {
-
-                        const replay =
-                            JSON.parse(
-                                reader.result
-                            );
-
-                        sessionStorage.setItem(
-                            "replayData",
-                            JSON.stringify(
-                                replay.replayData
-                            )
-                        );
-
-                        sessionStorage.setItem(
-                            "replaySeed",
-                            replay.seed
-                        );
-
-                        location.href =
-                            "game.html?replay=1";
-                    };
-
-                reader.readAsText(
-                    file
-                );
-            }
+        sessionStorage.setItem(
+            "replayName",
+            replay.name || "Unknown"
         );
 
-        document
-        .getElementById("startButton")
-        .addEventListener(
-            "click",
-            () => {
-
-                const nickname =
-                    document
-                    .getElementById(
-                        "nickname"
-                    )
-                    .value
-                    .trim();
-
-                sessionStorage.setItem(
-                    "nickname",
-                    nickname || "Anonymous"
-                );
-
-                location.href =
-                    "game.html";
-            }
+        sessionStorage.setItem(
+            "replayScore",
+            replay.score || 0
         );
-    </script>
+
+        location.href =
+            "game.html?replay=1";
+    };
+
+    reader.readAsText(
+        file
+    );
+};
+
+</script>
 
 </body>
 </html>
