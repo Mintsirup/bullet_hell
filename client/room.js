@@ -42,12 +42,16 @@ event => {
             event.data
         );
 
+    console.log(
+        "WS MESSAGE",
+        data
+    );
+
     switch (
         data.type
     ) {
 
-        case
-        "roomUpdate":
+        case "roomUpdate":
 
             renderPlayers(
                 data.room
@@ -55,8 +59,11 @@ event => {
 
             break;
 
-        case
-        "gameStart":
+        case "gameStart":
+
+            console.log(
+                "GAME START RECEIVED"
+            );
 
             location.href =
                 `game.html?room=${roomId}`;

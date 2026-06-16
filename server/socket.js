@@ -271,12 +271,7 @@ wss.on(
                     case
                     "startRoom": {
 
-                        rooms.startRoom(
-                            data.roomId
-                        );
-
                         const room =
-
                             rooms.getRoom(
                                 data.roomId
                             );
@@ -336,7 +331,7 @@ wss.on(
 
                         console.log(
                             "START ROOM",
-                            roomId,
+                            data.roomId,
                             room.started
                         );
 
