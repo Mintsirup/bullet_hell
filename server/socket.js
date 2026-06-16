@@ -327,7 +327,7 @@ wss.on(
                                             "gameStart",
 
                                         roomId:
-                                            room.id
+                                            data.roomId
                                     }
                                 );
                             }
