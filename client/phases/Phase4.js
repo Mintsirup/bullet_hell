@@ -1,4 +1,4 @@
-import CirclePattern from "../../shared/patterns/ManyCirclePattern.js";
+import ManyCirclePattern from "../../shared/patterns/ManyCirclePattern.js";
 
 export default class Phase4 {
 
