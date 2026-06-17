@@ -278,22 +278,32 @@ async function finishGame() {
             gameStats.bulletsHit,
 
         hp:
-            player.hp
+            player.hp,
+
+        seed,
+        replayData
     };
 
-    const response =
+    try {
+
         await fetch(
             "/submitReplay",
             {
                 method: "POST",
+
                 headers: {
                     "Content-Type":
                         "application/json"
                 },
+
                 body: JSON.stringify({
+
                     seed,
+
                     replayData,
+
                     result,
+
                     name:
                         sessionStorage.getItem(
                             "nickname"
@@ -302,13 +312,18 @@ async function finishGame() {
             }
         );
 
-    const data =
-        await response.json();
+    } catch (err) {
+
+        console.error(
+            "Replay upload failed:",
+            err
+        );
+    }
 
     sessionStorage.setItem(
         "result",
         JSON.stringify(
-            data.result
+            result
         )
     );
 
