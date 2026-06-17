@@ -324,10 +324,19 @@ const raw =
         "result"
     );
 
-console.log(
-    "RAW RESULT =",
-    raw
-);
+if (!raw) {
+
+    alert(
+        "결과 데이터가 없습니다."
+    );
+
+    location.href =
+        "index.html";
+
+    throw new Error(
+        "Missing result"
+    );
+}
 
 const result =
     JSON.parse(raw);
