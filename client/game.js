@@ -176,19 +176,21 @@ resize();
 
 async function finishGame() {
 
-    const debug = calculateScore(
-        gameStats,
-        player
-    );
+    if (gameEnded) return;
 
-    alert(
-        JSON.stringify(
-            {
+    gameEnded = true;
+
+    if (replayMode) {
+
+        sessionStorage.setItem(
+            "result",
+            JSON.stringify({
+
+                score: 0,
+                rank: "REPLAY",
+
                 survivedTime:
                     gameStats.survivedTime,
-
-                phase4Time:
-                    gameStats.phase4Time,
 
                 bulletsSpawned:
                     gameStats.bulletsSpawned,
@@ -196,96 +198,78 @@ async function finishGame() {
                 bulletsHit:
                     gameStats.bulletsHit,
 
-                hp:
-                    player.hp,
+                bulletsDodged:
+                    gameStats.bulletsSpawned -
+                    gameStats.bulletsHit
+            })
+        );
 
-                score:
-                    debug.score,
+        location.href =
+            "result.html";
 
-                rank:
-                    debug.rank
-            },
-            null,
-            2
+        return;
+    }
+
+    const result = {
+
+        ...calculateScore(
+            gameStats,
+            player
+        ),
+
+        survivedTime:
+            gameStats.survivedTime,
+
+        phase4Time:
+            gameStats.phase4Time,
+
+        bulletsSpawned:
+            gameStats.bulletsSpawned,
+
+        bulletsHit:
+            gameStats.bulletsHit,
+
+        bulletsDodged:
+            gameStats.bulletsSpawned -
+            gameStats.bulletsHit,
+
+        hp:
+            player.hp
+    };
+
+    const response =
+        await fetch(
+            "/submitReplay",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+                body: JSON.stringify({
+                    seed,
+                    replayData,
+                    result,
+                    name:
+                        sessionStorage.getItem(
+                            "nickname"
+                        ) || "Anonymous"
+                })
+            }
+        );
+
+    const data =
+        await response.json();
+
+    sessionStorage.setItem(
+        "result",
+        JSON.stringify(
+            data.result
         )
     );
 
-    if (gameEnded) return;
-
-    gameEnded = true;
-
-        if (replayMode) {
-
-            sessionStorage.setItem(
-                "result",
-                JSON.stringify({
-
-                    score: 0,
-                    rank: "REPLAY",
-
-                    survivedTime:
-                        gameStats.survivedTime,
-
-                    bulletsSpawned:
-                        gameStats.bulletsSpawned,
-
-                    bulletsHit:
-                        gameStats.bulletsHit,
-
-                    bulletsDodged:
-                        gameStats.bulletsSpawned -
-                        gameStats.bulletsHit
-                })
-            );
-
-            console.log(
-                calculateScore(
-                    gameStats,
-                    player
-                )
-            );
-
-            location.href =
-                "result.html";
-
-            return;
-        }
-
-    if (!replayMode) {
-
-        const response =
-            await fetch(
-                "/submitReplay",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-                    body: JSON.stringify({
-                        seed,
-                        replayData,
-                        name:
-                            sessionStorage.getItem(
-                                "nickname"
-                            ) || "Anonymous"
-                    })
-                }
-            );
-
-        const data =
-            await response.json();
-
-        location.href = "result.html";
-
-        sessionStorage.setItem(
-            "result",
-            JSON.stringify(
-                data.result
-            )
-        );
-
-    }
+    location.href =
+        "result.html";
 }
 
 // 게임 진행하는 부분

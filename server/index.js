@@ -74,14 +74,22 @@ app.post(
             const {
                 seed,
                 replayData,
+                result,
                 name
             } = req.body;
 
-            const result =
-                verifyReplay(
-                    seed,
-                    replayData
-                );
+            const replayHash =
+                crypto
+                    .createHash(
+                        "sha256"
+                    )
+                    .update(
+                        JSON.stringify({
+                            seed,
+                            replayData
+                        })
+                    )
+                    .digest("hex");
 
             const added =
                 addScore({
@@ -94,8 +102,7 @@ app.post(
                     rank:
                         result.rank,
 
-                    replayHash:
-                        result.replayHash,
+                    replayHash,
 
                     seed,
 
@@ -104,7 +111,9 @@ app.post(
                     time:
                         Date.now()
                 });
-                broadcastLeaderboard();
+
+            broadcastLeaderboard();
+
             res.json({
 
                 success: true,

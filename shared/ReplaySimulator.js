@@ -141,10 +141,14 @@ export default class ReplaySimulator {
             }
 
             const spawned =
+                phase.update(FIXED_DELTA);
 
-                phase.update(
-                    FIXED_DELTA
-                );
+                if (spawned.length > 50) {
+                    console.log(
+                        frame,
+                        spawned.length
+                    );
+                }
 
             bullets.push(
                 ...spawned
@@ -246,5 +250,13 @@ export default class ReplaySimulator {
             hp:
                 player.hp
         };
+
+        console.log({
+            hp: player.hp,
+            survivedTime: gameStats.survivedTime,
+            phase4Time: gameStats.phase4Time,
+            bulletsSpawned: gameStats.bulletsSpawned,
+            bossPhase: boss.phase
+        });
     }
 }
