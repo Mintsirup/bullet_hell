@@ -21,6 +21,50 @@ const GAME_HEIGHT = 720;
 canvas.width = GAME_WIDTH;
 canvas.height = GAME_HEIGHT;
 
+window.onerror = function (
+    message,
+    source,
+    lineno,
+    colno,
+    error
+) {
+
+    alert(
+        [
+            "ERROR",
+            "",
+            "Message: " + message,
+            "File: " + source,
+            "Line: " + lineno,
+            "Column: " + colno,
+            "",
+            error?.stack || ""
+        ].join("\n")
+    );
+
+    console.error(error);
+
+    return true;
+};
+
+window.onunhandledrejection =
+    function (event) {
+
+        alert(
+            [
+                "PROMISE ERROR",
+                "",
+                event.reason?.stack ||
+                event.reason?.message ||
+                String(event.reason)
+            ].join("\n")
+        );
+
+        console.error(
+            event.reason
+        );
+    };
+
 // 키 입역 전역 관리
 const keys = {};
 
@@ -179,6 +223,8 @@ async function finishGame() {
     if (gameEnded) return;
 
     gameEnded = true;
+
+    
 
     if (replayMode) {
 
@@ -523,48 +569,46 @@ function drawGame() {
 
 function loop(currentTime) {
 
-    if (!lastTime) {
+    try {
 
-        lastTime =
-            currentTime;
+        if (!lastTime) {
 
-        requestAnimationFrame(
-            loop
+            lastTime = currentTime;
+
+            requestAnimationFrame(loop);
+
+            return;
+        }
+
+        const frameTime =
+            (currentTime - lastTime) / 1000;
+
+        lastTime = currentTime;
+
+        accumulator += frameTime;
+
+        while (
+            accumulator >= FIXED_DELTA
+        ) {
+
+            updateGame(FIXED_DELTA);
+
+            accumulator -= FIXED_DELTA;
+        }
+
+        drawGame();
+
+    } catch (err) {
+
+        alert(
+            "LOOP ERROR\n\n" +
+            (err.stack || err)
         );
 
-        return;
+        console.error(err);
     }
 
-    const frameTime =
-
-        (currentTime -
-        lastTime) / 1000;
-
-    lastTime =
-        currentTime;
-
-    accumulator +=
-        frameTime;
-
-    while (
-
-        accumulator >=
-        FIXED_DELTA
-    ) {
-
-        updateGame(
-            FIXED_DELTA
-        );
-
-        accumulator -=
-            FIXED_DELTA;
-    }
-
-    drawGame();
-
-    requestAnimationFrame(
-        loop
-    );
+    requestAnimationFrame(loop);
 }
 
 requestAnimationFrame(loop);
