@@ -65,24 +65,46 @@ app.use(
     )
 );
 
+const bannedWords = [
+    "시발",
+    "씨발",
+    "병신",
+    "좆",
+    "ㅂㅅ",
+    "새끼"
+];
+
+function containsBadWord(name) {
+
+    return bannedWords.some(
+        word =>
+            name.includes(word)
+    );
+}
+
 app.post(
     "/submitReplay",
     (req, res) => {
 
         try {
 
-            const {
+            let {
                 seed,
                 replayData,
                 result,
                 name
             } = req.body;
 
+            if (
+                containsBadWord(name)
+            ) {
+
+                name = "익명";
+            }
+
             const replayHash =
                 crypto
-                    .createHash(
-                        "sha256"
-                    )
+                    .createHash("sha256")
                     .update(
                         JSON.stringify({
                             seed,
