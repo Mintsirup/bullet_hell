@@ -224,8 +224,6 @@ async function finishGame() {
 
     gameEnded = true;
 
-    
-
     if (replayMode) {
 
         sessionStorage.setItem(
@@ -250,10 +248,10 @@ async function finishGame() {
             })
         );
 
-        /*location.href =
+        location.href =
             "result.html";
 
-        return; */ 
+        return;
     }
 
     const result = {
@@ -314,8 +312,8 @@ async function finishGame() {
         )
     );
 
-    location.href =
-        "result.html";
+    /* location.href =
+        "result.html"; */
 }
 
 // 게임 진행하는 부분
