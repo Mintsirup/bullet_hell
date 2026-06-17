@@ -1,126 +1,82 @@
 async function loadLeaderboard() {
 
-
-if (!window.leaderboardSocket) {
-
-    window.leaderboardSocket =
-        new WebSocket(
-            `ws://${window.location.hostname}:23334`
+    const response =
+        await fetch(
+            "/leaderboard"
         );
 
-    window.leaderboardSocket.onmessage =
-        event => {
+    const data =
+        await response.json();
 
-            const message =
-                JSON.parse(
-                    event.data
-                );
-
-            if (
-                message.type ===
-                "leaderboard"
-            ) {
-
-                renderLeaderboard(
-                    message.data
-                );
-            }
-        };
-
-    window.leaderboardSocket.onerror =
-        err => {
-
-            console.error(
-                "Leaderboard WebSocket Error",
-                err
-            );
-        };
-}
-
-const response =
-    await fetch(
-        "/leaderboard"
+    renderLeaderboard(
+        data
     );
-
-const data =
-    await response.json();
-
-renderLeaderboard(
-    data
-);
-```
-
 }
 
 function renderLeaderboard(data) {
 
-```
-const list =
-    document.getElementById(
-        "leaderboard"
-    );
+    const list =
+        document.getElementById(
+            "leaderboard"
+        );
 
-list.innerHTML = "";
+    list.innerHTML = "";
 
-data.forEach(
-    (entry, index) => {
+    data.forEach(
+        (entry, index) => {
 
-        const row =
-            document.createElement(
-                "div"
-            );
+            const row =
+                document.createElement(
+                    "div"
+                );
 
-        row.className =
-            "entry";
+            row.className =
+                "entry";
 
-        if (index === 0)
-            row.classList.add(
-                "top1"
-            );
+            if (index === 0)
+                row.classList.add(
+                    "top1"
+                );
 
-        if (index === 1)
-            row.classList.add(
-                "top2"
-            );
+            if (index === 1)
+                row.classList.add(
+                    "top2"
+                );
 
-        if (index === 2)
-            row.classList.add(
-                "top3"
-            );
+            if (index === 2)
+                row.classList.add(
+                    "top3"
+                );
 
-        row.innerHTML =
-        `
-        <div class="rank">
-            #${index + 1}
-        </div>
+            row.innerHTML =
+            `
+            <div class="rank">
+                #${index + 1}
+            </div>
 
-        <div class="name">
-            ${entry.name || "Anonymous"}
-        </div>
+            <div class="name">
+                ${entry.name || "Anonymous"}
+            </div>
 
-        <div class="score">
-            ${Number(
-                entry.score || 0
-            ).toLocaleString()}
-        </div>
+            <div class="score">
+                ${entry.score}
+            </div>
 
-        <button
-            class="watchBtn"
-            data-id="${entry.id}">
-            관전
-        </button>
-        `;
+            <button
+                class="watchBtn"
+                data-id="${entry.id}">
+                관전
+            </button>
+            `;
 
-        const button =
-            row.querySelector(
-                ".watchBtn"
-            );
+            const button =
+                row.querySelector(
+                    ".watchBtn"
+                );
 
-        button.addEventListener(
-            "click",
-            async () => {
-
-                try {
+            button.addEventListener(
+                "click",
+                async () => {
 
                     const response =
                         await fetch(
@@ -154,27 +110,14 @@ data.forEach(
 
                     location.href =
                         "game.html?replay=1";
-
-                } catch (err) {
-
-                    console.error(
-                        err
-                    );
-
-                    alert(
-                        "리플레이를 불러오지 못했습니다."
-                    );
                 }
-            }
-        );
+            );
 
-        list.appendChild(
-            row
-        );
-    }
-);
-
-
+            list.appendChild(
+                row
+            );
+        }
+    );
 }
 
 loadLeaderboard();

@@ -25,31 +25,6 @@ const app =
 
 app.use(cors());
 
-function broadcastLeaderboard() {
-
-    const data =
-        JSON.stringify({
-
-            type:
-                "leaderboard",
-
-            data:
-                getLeaderboard()
-        });
-
-    wss.clients.forEach(
-        client => {
-
-            if (
-                client.readyState === 1
-            ) {
-
-                client.send(data);
-            }
-        }
-    );
-}
-
 app.use(
     express.json({
         limit: "10mb"
