@@ -312,8 +312,8 @@ async function finishGame() {
         )
     );
 
-    /* location.href =
-        "result.html"; */
+    location.href =
+        "result.html";
 }
 
 // 게임 진행하는 부분
