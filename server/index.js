@@ -82,79 +82,28 @@ function containsBadWord(name) {
     );
 }
 
-app.post(
-    "/submitReplay",
-    (req, res) => {
+app.post("/submitReplay", (req, res) => {
 
-        try {
+    const {
+        seed,
+        replayData,
+        result,
+        name
+    } = req.body;
 
-            let {
-                seed,
-                replayData,
-                result,
-                name
-            } = req.body;
+    addScore({
+        name,
+        score: result.score,
+        rank: result.rank,
+        seed,
+        replayData,
+        time: Date.now()
+    });
 
-            if (
-                containsBadWord(name)
-            ) {
-
-                name = "익명";
-            }
-
-            const replayHash =
-                crypto
-                    .createHash("sha256")
-                    .update(
-                        JSON.stringify({
-                            seed,
-                            replayData
-                        })
-                    )
-                    .digest("hex");
-
-            const added =
-                addScore({
-
-                    name,
-
-                    score:
-                        result.score,
-
-                    rank:
-                        result.rank,
-
-                    replayHash,
-
-                    seed,
-
-                    replayData,
-
-                    time:
-                        Date.now()
-                });
-
-            broadcastLeaderboard();
-
-            res.json({
-
-                success: true,
-
-                added,
-
-                result
-            });
-
-        } catch (err) {
-
-            console.error(err);
-
-            res.status(500).json({
-                success: false
-            });
-        }
-    }
-);
+    res.json({
+        success: true
+    });
+});
 
 app.get(
     "/replay/:id",
