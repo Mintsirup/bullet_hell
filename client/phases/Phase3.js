@@ -14,91 +14,71 @@ export default class Phase3 {
         this.changeTimer = 0;
 
         this.currentPatterns =
-            this.getTwoRandomPatterns();
-        }
-
-    getRandomPattern() {
-
-        const patterns = [
-            () => new CirclePattern(this.boss),
-            () => new RainPattern(this.canvas, this.rng),
-            () => new SpinPattern(this.boss),
-            () => new WallPattern(this.canvas, this.rng)
-        ];
-
-        const random =
-            Math.floor(
-                this.rng.next() *
-                patterns.length
-            );
-
-        return patterns[random]();
+            this.getRandomPatterns();
     }
 
-    getTwoRandomPatterns() {
+    getRandomPatterns() {
 
-        const patterns = [
+        const roll =
+            this.rng.next();
 
-            () => new CirclePattern(this.boss),
+        // 25% 확률로 벽 단독
 
-            () => new RainPattern(this.canvas, this.rng),
+        if (roll < 0.25) {
 
-            () => new SpinPattern(this.boss),
-
-            () => new WallPattern(this.canvas, this.rng)
-        ];
-
-        const index1 =
-            Math.floor(
-                this.rng.next() *
-                patterns.length
-            );
-
-        let index2 =
-            Math.floor(
-                this.rng.next() *
-                patterns.length
-            );
-
-        while (
-            index2 === index1
-        ) {
-
-            index2 =
-                Math.floor(
-                    this.rng.next() *
-                    patterns.length
-                );
+            return [
+                new WallPattern(
+                    this.canvas,
+                    this.rng
+                )
+            ];
         }
 
-        return [
-        
-            patterns[index1](),
+        const pool = [
 
-            patterns[index2]()
+            () => new CirclePattern(
+                this.boss
+            ),
+
+            () => new RainPattern(
+                this.canvas,
+                this.rng
+            ),
+
+            () => new SpinPattern(
+                this.boss
+            )
+        ];
+
+        const shuffled =
+            [...pool].sort(
+                () => this.rng.next() - 0.5
+            );
+
+        return [
+
+            shuffled[0](),
+            shuffled[1]()
         ];
     }
 
     update(deltaTime) {
 
-        this.changeTimer +=
-            deltaTime;
+        this.changeTimer += deltaTime;
 
-        if (
-            this.changeTimer >= 5
-        ) {
+        if (this.changeTimer >= 5) {
 
             this.changeTimer = 0;
 
             this.currentPatterns =
-                this.getTwoRandomPatterns();
+                this.getRandomPatterns();
         }
 
         const bullets = [];
 
         for (
-            const pattern
-            of this.currentPatterns
+            const pattern of
+            this.currentPatterns
         ) {
 
             bullets.push(

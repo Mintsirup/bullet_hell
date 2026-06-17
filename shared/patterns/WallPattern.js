@@ -19,9 +19,9 @@ export default class WallPattern {
 
             this.timer = 0;
 
-            const columns = 500;
+            const columns = 200;
 
-            const gapSize = 20;
+            const gapSize = 25;
 
             const gap =
                 Math.floor(

@@ -13,7 +13,7 @@ export default class Player {
         this.canvas = canvas;
         this.gameStats = gameStats;
 
-        this.radius = 10;
+        this.radius = 8;
         this.speed = 400;
 
         this.maxHp = 100;
