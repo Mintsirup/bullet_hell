@@ -1,15 +1,11 @@
-import RainPattern from "../../shared/patterns/RainPattern.js";
-import CirclePattern from "../../shared/patterns/CirclePattern.js";
-import SpinPattern from "../../shared/patterns/SpinPattern.js";
+import CirclePattern from "../../shared/patterns/ManyCirclePattern.js";
 
 export default class Phase4 {
 
-    constructor(canvas, boss, rng) {
+    constructor(boss) {
 
         this.patterns = [
-            new CirclePattern(boss),
-            new SpinPattern(boss),
-            new RainPattern(canvas, rng)
+            new ManyCirclePattern(boss)
         ];
     }
 
