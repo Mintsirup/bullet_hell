@@ -13,9 +13,9 @@ export default class Phase3 {
 
         this.changeTimer = 0;
 
-        this.currentPattern =
-            new CirclePattern(boss);
-    }
+        this.currentPatterns =
+            this.getTwoRandomPatterns();
+        }
 
     getRandomPattern() {
 
@@ -35,20 +35,79 @@ export default class Phase3 {
         return patterns[random]();
     }
 
+    getTwoRandomPatterns() {
+
+        const patterns = [
+
+            () => new CirclePattern(this.boss),
+
+            () => new RainPattern(this.canvas, this.rng),
+
+            () => new SpinPattern(this.boss),
+
+            () => new WallPattern(this.canvas, this.rng)
+        ];
+
+        const index1 =
+            Math.floor(
+                this.rng.next() *
+                patterns.length
+            );
+
+        let index2 =
+            Math.floor(
+                this.rng.next() *
+                patterns.length
+            );
+
+        while (
+            index2 === index1
+        ) {
+
+            index2 =
+                Math.floor(
+                    this.rng.next() *
+                    patterns.length
+                );
+        }
+
+        return [
+        
+            patterns[index1](),
+
+            patterns[index2]()
+        ];
+    }
+
     update(deltaTime) {
 
-        this.changeTimer += deltaTime;
+        this.changeTimer +=
+            deltaTime;
 
-        if (this.changeTimer >= 5) {
+        if (
+            this.changeTimer >= 5
+        ) {
 
             this.changeTimer = 0;
 
-            this.currentPattern =
-                this.getRandomPattern();
+            this.currentPatterns =
+                this.getTwoRandomPatterns();
         }
 
-        return this.currentPattern.update(
-            deltaTime
-        );
+        const bullets = [];
+
+        for (
+            const pattern
+            of this.currentPatterns
+        ) {
+
+            bullets.push(
+                ...pattern.update(
+                    deltaTime
+                )
+            );
+        }
+
+        return bullets;
     }
 }
