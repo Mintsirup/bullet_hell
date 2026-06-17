@@ -250,10 +250,10 @@ async function finishGame() {
             })
         );
 
-        location.href =
+        /*location.href =
             "result.html";
 
-        return;
+        return; */ 
     }
 
     const result = {
