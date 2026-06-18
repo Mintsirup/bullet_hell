@@ -1,1 +1,15 @@
-[]
+[
+    {
+        "username": "mintiua",
+        "password": "mint",
+        "stats": {
+            "gamesPlayed": 0,
+            "highestScore": 0,
+            "highestRank": "F",
+            "totalBulletsDodged": 0,
+            "totalBulletsHit": 0,
+            "totalSurvivalTime": 0
+        },
+        "achievements": []
+    }
+]

@@ -293,33 +293,43 @@ async function finishGame() {
                 )
             );
 
-        await fetch(
-            "/submitReplay",
-            {
-                method: "POST",
+        const response =
+            await fetch(
+                "/submitReplay",
+                {
+                    method: "POST",
 
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
 
-                body: JSON.stringify({
+                    body: JSON.stringify({
 
-                    seed,
+                        seed,
+                        replayData,
+                        replayHash,
+                        result,
 
-                    replayData,
+                        username:
+                            localStorage.getItem(
+                                "username"
+                            )
+                    })
+                }
+            );
 
-                    replayHash,
+            const data =
+                await response.json();
 
-                    result,
+            sessionStorage.setItem(
 
-                    name:
-                        localStorage.getItem(
-                            "username"
-                        )
-                })
-            }
-        );
+                "newAchievements",
+
+                JSON.stringify(
+                    data.unlocked || []
+                )
+            );
 
     } catch (err) {
 

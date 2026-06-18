@@ -63,6 +63,19 @@ if (!fs.existsSync(LEADERBOARD_FILE)) {
     );
 }
 
+function unlockAchievement(
+    user,
+    id
+){
+
+    if(
+        !user.achievements.includes(id)
+    ){
+
+        user.achievements.push(id);
+    }
+}
+
 const app =
     express();
 
@@ -154,6 +167,53 @@ app.get("/leaderboard", (req, res) => {
         page("leaderboard.html")
     );
 });
+
+app.get("/profile", (req,res) => {
+
+    res.sendFile(
+        page("profile.html")
+    );
+    
+});
+
+app.get(
+    "/api/profile/:username",
+    (req,res)=>{
+
+        const users =
+            loadUsers();
+
+        const user =
+            users.find(
+
+                x =>
+                x.username ===
+                req.params.username
+            );
+
+        if(!user){
+
+            return res
+            .status(404)
+            .json({
+
+                error:"not found"
+            });
+        }
+
+        res.json({
+
+            username:
+                user.username,
+
+            stats:
+                user.stats,
+
+            achievements:
+                user.achievements
+        });
+    }
+);
 
 function loadUsers() {
 
@@ -266,7 +326,24 @@ app.post(
 
             username,
 
-            password
+            password,
+
+            stats: {
+
+                gamesPlayed: 0,
+
+                highestScore: 0,
+
+                highestRank: "F",
+
+                totalBulletsDodged: 0,
+
+                totalBulletsHit: 0,
+
+                totalSurvivalTime: 0
+            },
+
+            achievements: []
         });
 
         saveUsers(users);
@@ -318,6 +395,8 @@ app.post(
     }
 );
 
+const unlocked = [];
+
 app.post(
     "/submitReplay",
     (req, res) => {
@@ -329,23 +408,36 @@ app.post(
                 replayData,
                 replayHash,
                 result,
-                name
+                username
             } = req.body;
 
-            if (!name) {
+            const unlocked = [];
+
+            const ranks = [
+
+                "F",
+                "D",
+                "C",
+                "B",
+                "A",
+                "S",
+                "S+"
+            ];
+
+            if (!username) {
 
                 return res.json({
 
                     success: false,
 
                     error:
-                        "닉네임 없음"
+                        "로그인 필요"
                 });
             }
 
             if (
                 containsBadWord(
-                    name
+                    username
                 )
             ) {
 
@@ -361,7 +453,8 @@ app.post(
             const success =
                 addScore({
 
-                    name,
+                    name:
+                        username,
 
                     score:
                         result.score,
@@ -390,11 +483,215 @@ app.post(
                 });
             }
 
+            const users =
+                loadUsers();
+
+            const user =
+                users.find(
+                    x =>
+                        x.username ===
+                        username
+                );
+
+            if (user) {
+
+                user.stats.gamesPlayed++;
+
+                user.stats.totalBulletsDodged +=
+                    result.bulletsDodged || 0;
+
+                user.stats.totalBulletsHit +=
+                    result.bulletsHit || 0;
+
+                user.stats.totalSurvivalTime +=
+                    result.survivedTime || 0;
+
+                if (
+                    result.score >
+                    user.stats.highestScore
+                ) {
+
+                    user.stats.highestScore =
+                        result.score;
+                }
+
+                if (
+                    ranks.indexOf(
+                        result.rank
+                    )
+                    >
+                    ranks.indexOf(
+                        user.stats.highestRank
+                    )
+                ) {
+
+                    user.stats.highestRank =
+                        result.rank;
+                }
+
+                // 첫 플레이
+                if (
+                    !user.achievements.includes(
+                        "FIRST_GAME"
+                    )
+                ) {
+
+                    unlockAchievement(
+                        user,
+                        "FIRST_GAME"
+                    );
+
+                    unlocked.push(
+                        "🎮 첫 플레이"
+                    );
+                }
+
+                // S 랭크
+                if (
+                    result.rank === "S" ||
+                    result.rank === "S+"
+                ) {
+
+                    if (
+                        !user.achievements.includes(
+                            "GET_S"
+                        )
+                    ) {
+
+                        unlockAchievement(
+                            user,
+                            "GET_S"
+                        );
+
+                        unlocked.push(
+                            "⭐ S 랭크 달성"
+                        );
+                    }
+                }
+
+                // S+
+                if (
+                    result.rank === "S+"
+                ) {
+
+                    if (
+                        !user.achievements.includes(
+                            "GET_S_PLUS"
+                        )
+                    ) {
+
+                        unlockAchievement(
+                            user,
+                            "GET_S_PLUS"
+                        );
+
+                        unlocked.push(
+                            "👑 S+ 랭크 달성"
+                        );
+                    }
+                }
+
+                // 100만점
+                if (
+                    result.score >=
+                    1000000
+                ) {
+
+                    if (
+                        !user.achievements.includes(
+                            "ONE_MILLION"
+                        )
+                    ) {
+
+                        unlockAchievement(
+                            user,
+                            "ONE_MILLION"
+                        );
+
+                        unlocked.push(
+                            "💰 백만점 달성"
+                        );
+                    }
+                }
+
+                // 풀피
+                if (
+                    result.hp >= 100
+                ) {
+
+                    if (
+                        !user.achievements.includes(
+                            "FULL_HP"
+                        )
+                    ) {
+
+                        unlockAchievement(
+                            user,
+                            "FULL_HP"
+                        );
+
+                        unlocked.push(
+                            "❤️ 풀피 클리어"
+                        );
+                    }
+                }
+
+                // 100판
+                if (
+                    user.stats.gamesPlayed >=
+                    100
+                ) {
+
+                    if (
+                        !user.achievements.includes(
+                            "PLAY_100"
+                        )
+                    ) {
+
+                        unlockAchievement(
+                            user,
+                            "PLAY_100"
+                        );
+
+                        unlocked.push(
+                            "🎯 100판 플레이"
+                        );
+                    }
+                }
+
+                // 총알 100만 회피
+                if (
+                    user.stats.totalBulletsDodged >=
+                    1000000
+                ) {
+
+                    if (
+                        !user.achievements.includes(
+                            "MILLION_DODGE"
+                        )
+                    ) {
+
+                        unlockAchievement(
+                            user,
+                            "MILLION_DODGE"
+                        );
+
+                        unlocked.push(
+                            "🌀 총알 100만 회피"
+                        );
+                    }
+                }
+
+                saveUsers(users);
+            }
+
             res.json({
 
                 success: true,
 
-                result
+                result,
+
+                unlocked
             });
 
         } catch (err) {

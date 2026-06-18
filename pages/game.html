@@ -133,6 +133,75 @@ canvas {
     font-size: 14px;
 }
 
+#achievementContainer{
+
+    position:fixed;
+
+    right:20px;
+    bottom:20px;
+
+    display:flex;
+    flex-direction:column;
+
+    gap:10px;
+
+    z-index:9999;
+}
+
+.achievementToast{
+
+    min-width:300px;
+
+    padding:15px;
+
+    border-radius:12px;
+
+    background:
+        rgba(0,0,0,.9);
+
+    border:
+        2px solid gold;
+
+    color:white;
+
+    animation:
+        achievementPop .5s ease,
+        achievementFade .5s ease 4.5s forwards;
+
+    box-shadow:
+        0 0 20px gold;
+}
+
+@keyframes achievementPop{
+
+    from{
+
+        opacity:0;
+
+        transform:
+            translateX(100px);
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:
+            translateX(0);
+    }
+}
+
+@keyframes achievementFade{
+
+    to{
+
+        opacity:0;
+
+        transform:
+            translateX(100px);
+    }
+}
+
 </style>
 </head>
 
@@ -149,6 +218,8 @@ canvas {
 <div id="version">
     v1.0
 </div>
+
+<div id="achievementContainer"></div>
 
 <script
     type="module"

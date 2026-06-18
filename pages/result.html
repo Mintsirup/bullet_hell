@@ -202,6 +202,63 @@ transform:
 
 }
 
+#achievementContainer{
+
+    position:fixed;
+
+    right:20px;
+    bottom:20px;
+
+    display:flex;
+    flex-direction:column;
+
+    gap:10px;
+
+    z-index:9999;
+}
+
+.achievementToast{
+
+    min-width:300px;
+
+    padding:15px;
+
+    border-radius:12px;
+
+    background:
+        rgba(0,0,0,.9);
+
+    border:
+        2px solid gold;
+
+    color:white;
+
+    box-shadow:
+        0 0 20px gold;
+
+    animation:
+        slideIn .3s ease;
+}
+
+@keyframes slideIn{
+
+    from{
+
+        opacity:0;
+
+        transform:
+            translateX(100px);
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:
+            translateX(0);
+    }
+}
+
 </style>
 
 </head>
@@ -252,8 +309,62 @@ transform:
 
 </div>
 
+<div id="achievementContainer"></div>
+
+<div id="newAchievements"></div>
+
 
 <script>
+
+import {
+    showAchievement
+}
+from "./achievementToast.js";
+
+const unlocked =
+
+    JSON.parse(
+
+        sessionStorage.getItem(
+            "newAchievements"
+        ) || "[]"
+    );
+
+unlocked.forEach(
+    achievement => {
+
+        showAchievement(
+            achievement
+        );
+    }
+);
+
+const achievementBox =
+
+    document.getElementById(
+        "newAchievements"
+    );
+
+if(
+    unlocked.length > 0
+){
+
+    achievementBox.innerHTML =
+
+        "<h2>새 업적</h2>" +
+
+        unlocked.map(
+
+            x =>
+            `<div>${x}</div>`
+
+        ).join("");
+
+}else{
+
+    achievementBox.innerHTML =
+        "";
+}
 
 document
 .getElementById(
