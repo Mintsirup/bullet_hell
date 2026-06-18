@@ -249,7 +249,7 @@ async function finishGame() {
         );
 
         location.href =
-            "result.html";
+            "/result";
 
         return;
     }
@@ -286,6 +286,13 @@ async function finishGame() {
 
     try {
 
+        const replayHash =
+            btoa(
+                JSON.stringify(
+                    replayData
+                )
+            );
+
         await fetch(
             "/submitReplay",
             {
@@ -302,12 +309,14 @@ async function finishGame() {
 
                     replayData,
 
+                    replayHash,
+
                     result,
 
                     name:
-                        sessionStorage.getItem(
-                            "nickname"
-                        ) || "Anonymous"
+                        localStorage.getItem(
+                            "username"
+                        )
                 })
             }
         );
@@ -328,7 +337,7 @@ async function finishGame() {
     );
 
     location.href =
-        "result.html";
+        "/result";
 }
 
 // 게임 진행하는 부분
@@ -581,6 +590,21 @@ function drawGame() {
 function loop(currentTime) {
 
     try {
+
+        const username =
+            localStorage.getItem(
+                "username"
+        );
+
+        if (!username) {
+
+            location.href =
+                "/login";
+
+            throw new Error(
+                "Not logged in"
+            );
+        }
 
         if (!lastTime) {
 

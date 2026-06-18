@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>회원가입</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+
+    margin:0;
+
+    width:100vw;
+    height:100vh;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    background:
+        radial-gradient(
+            circle at center,
+            #1a1a2e 0%,
+            #0f0f18 50%,
+            #000 100%
+        );
+
+    font-family:
+        "Segoe UI",
+        sans-serif;
+}
+
+#container{
+
+    width:420px;
+
+    padding:40px;
+
+    display:flex;
+    flex-direction:column;
+
+    gap:15px;
+
+    border-radius:20px;
+
+    background:
+        rgba(0,0,0,.7);
+
+    backdrop-filter:blur(10px);
+
+    border:
+        2px solid cyan;
+
+    box-shadow:
+        0 0 20px #00ffff55,
+        0 0 60px #00ffff22;
+}
+
+h1{
+
+    margin:0;
+
+    text-align:center;
+
+    color:cyan;
+
+    font-size:42px;
+
+    letter-spacing:3px;
+}
+
+input{
+
+    height:50px;
+
+    border:none;
+
+    border-radius:10px;
+
+    padding:0 15px;
+
+    background:#111;
+
+    color:white;
+
+    font-size:18px;
+}
+
+input:focus{
+
+    outline:none;
+
+    box-shadow:
+        0 0 10px cyan;
+}
+
+button{
+
+    height:55px;
+
+    border:none;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    color:white;
+
+    font-size:18px;
+
+    font-weight:bold;
+
+    transition:.15s;
+}
+
+button:hover{
+
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 0 20px #00ffff88;
+}
+
+.primary{
+
+    background:
+        linear-gradient(
+            135deg,
+            #00ffff,
+            #0088ff
+        );
+}
+
+.secondary{
+
+    background:
+        linear-gradient(
+            135deg,
+            #444,
+            #222
+        );
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>회원가입</h1>
+
+<input
+    id="username"
+    placeholder="아이디"
+>
+
+<input
+    id="password"
+    type="password"
+    placeholder="비밀번호"
+>
+
+<button
+    class="primary"
+    onclick="register()">
+
+    회원가입
+
+</button>
+
+<button
+    class="secondary"
+    onclick="location.href='/login'">
+
+    로그인
+
+</button>
+
+<script src="/client/register.js"></script>
+
+</body>
+</html>

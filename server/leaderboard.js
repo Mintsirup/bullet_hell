@@ -1,10 +1,51 @@
 import fs from "fs";
 import crypto from "crypto";
 
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename =
+    fileURLToPath(
+        import.meta.url
+    );
+
+const __dirname =
+    path.dirname(
+        __filename
+    );
+
 const FILE =
-    "./leaderboard.json";
+    path.join(
+        __dirname,
+        "data",
+        "leaderboard.json"
+    );
+
+const REPLAY_DIR =
+    path.join(
+        __dirname,
+        "data",
+        "replays"
+    );
+
+if (
+    !fs.existsSync(
+        REPLAY_DIR
+    )
+) {
+
+    fs.mkdirSync(
+        REPLAY_DIR,
+        {
+            recursive: true
+        }
+    );
+}
 
 let leaderboard = [];
+
+const replayHashes =
+    new Set();
 
 try {
 
@@ -48,6 +89,13 @@ export function addScore(
 ) {
 
     if (
+        !entry.replayHash
+    )
+    {
+        return false;
+    }
+
+    if (
         replayHashes.has(
             entry.replayHash
         )
@@ -56,16 +104,46 @@ export function addScore(
         return false;
     }
 
-    entry.id =
+    const id =
         crypto.randomUUID();
+
+    fs.writeFileSync(
+
+        path.join(
+            REPLAY_DIR,
+            `${id}.json`
+        ),
+
+        JSON.stringify({
+
+            seed:
+                entry.seed,
+
+            replayData:
+                entry.replayData
+        })
+    );
 
     replayHashes.add(
         entry.replayHash
     );
 
-    leaderboard.push(
-        entry
-    );
+    leaderboard.push({
+
+        id,
+
+        name:
+            entry.name,
+
+        score:
+            entry.score,
+
+        rank:
+            entry.rank,
+
+        time:
+            Date.now()
+    });
 
     leaderboard.sort(
         (a, b) =>
@@ -77,8 +155,19 @@ export function addScore(
     return true;
 }
 
-const replayHashes =
-    new Set();
+leaderboard.forEach(
+    entry => {
+
+        if (
+            entry.replayHash
+        ) {
+
+            replayHashes.add(
+                entry.replayHash
+            );
+        }
+    }
+);
 
 export function getLeaderboard() {
 

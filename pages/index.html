@@ -193,11 +193,6 @@ button:active{
 
 <p>S+가 되면 1만원을 얻을 수 있다고?!(선착순 1명 리플레이파일 필요)</p>
 
-<input
-    id="nickname"
-    placeholder="닉네임"
->
-
 <button
     id="startButton"
     class="primary">
@@ -234,6 +229,74 @@ button:active{
 
 <script>
 
+const username =
+    localStorage.getItem(
+        "username"
+    );
+
+if (!username) {
+
+    location.href =
+        "/login";
+
+} else {
+
+    const userText =
+        document.createElement(
+            "div"
+        );
+
+    userText.style.marginTop =
+        "10px";
+
+    userText.style.textAlign =
+        "center";
+
+    userText.style.color =
+        "#00ffff";
+
+    userText.textContent =
+        `${username} 님 환영합니다`;
+
+    document
+        .getElementById(
+            "container"
+        )
+        .appendChild(
+            userText
+        );
+
+    const logoutBtn =
+        document.createElement(
+            "button"
+        );
+
+    logoutBtn.className =
+        "secondary";
+
+    logoutBtn.textContent =
+        "로그아웃";
+
+    logoutBtn.onclick =
+        () => {
+
+            localStorage.removeItem(
+                "username"
+            );
+
+            location.href =
+                "/login";
+        };
+
+    document
+        .getElementById(
+            "container"
+        )
+        .appendChild(
+            logoutBtn
+        );
+}
+
 document
 .getElementById(
     "startButton"
@@ -241,22 +304,13 @@ document
 .onclick =
 () => {
 
-    const nickname =
-
-        document
-        .getElementById(
-            "nickname"
-        )
-        .value
-        .trim();
-
     sessionStorage.setItem(
         "nickname",
-        nickname || "Anonymous"
+        username
     );
 
     location.href =
-        "game.html";
+        "/game";
 };
 
 document
@@ -267,7 +321,7 @@ document
 () => {
 
     location.href =
-        "leaderboard.html";
+        "/leaderboard";
 };
 
 document
@@ -331,7 +385,7 @@ e => {
         );
 
         location.href =
-            "game.html?replay=1";
+            "/game?replay=1";
     };
 
     reader.readAsText(

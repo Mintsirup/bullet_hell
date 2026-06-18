@@ -2,7 +2,7 @@ async function loadLeaderboard() {
 
     const response =
         await fetch(
-            "/leaderboard"
+            "/api/leaderboard"
         );
 
     const data =
@@ -58,6 +58,10 @@ function renderLeaderboard(data) {
                 ${entry.name || "Anonymous"}
             </div>
 
+            <div class="rankBadge">
+                ${entry.rank}
+            </div>
+
             <div class="score">
                 ${entry.score}
             </div>
@@ -80,7 +84,7 @@ function renderLeaderboard(data) {
 
                     const response =
                         await fetch(
-                            `/replay/${entry.id}`
+                            `/api/replay/${entry.id}`
                         );
 
                     const replay =
@@ -109,13 +113,91 @@ function renderLeaderboard(data) {
                     );
 
                     location.href =
-                        "game.html?replay=1";
+                        "/game?replay=1";
                 }
             );
 
             list.appendChild(
                 row
             );
+
+            const badge =
+                row.querySelector(
+                    ".rankBadge"
+                );
+
+            switch(entry.rank){
+
+                case "S+":
+
+                    badge.style.background =
+                        "linear-gradient(135deg,#ff00ff,#00ffff)";
+
+                    badge.style.color =
+                        "#fff";
+
+                    break;
+
+                case "S":
+
+                    badge.style.background =
+                        "#ffd700";
+
+                    badge.style.color =
+                        "#000";
+
+                    break;
+
+                case "A":
+
+                    badge.style.background =
+                        "#00ffff";
+
+                    badge.style.color =
+                        "#000";
+
+                    break;
+
+                case "B":
+
+                    badge.style.background =
+                        "#66ff66";
+
+                    badge.style.color =
+                        "#000";
+
+                    break;
+
+                case "C":
+
+                    badge.style.background =
+                        "#ff9933";
+
+                    badge.style.color =
+                        "#000";
+
+                    break;
+
+                case "D":
+
+                    badge.style.background =
+                        "#888";
+
+                    badge.style.color =
+                        "#fff";
+
+                    break;
+
+                case "F":
+
+                    badge.style.background =
+                        "#ff4444";
+
+                    badge.style.color =
+                        "#fff";
+
+                    break;
+            }
         }
     );
 }

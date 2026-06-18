@@ -25,7 +25,7 @@ const bulletsDodged =
 
 const survivalRatio =
     Math.min(
-        gameStats.survivedTime / 180,
+        gameStats.survivedTime / 120,
         1
     );
 

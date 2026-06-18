@@ -236,15 +236,15 @@ transform:
 <div class="buttons">
 
     <button id="replay">
-        ▶ Replay
+        ▶ 리플레이 보기
     </button>
 
     <button id="saveReplay">
-        💾 Save Replay
+        💾 리플레이 저장
     </button>
 
     <button id="go_to_main">
-        🏠 Main Menu
+        🏠 메인메뉴
     </button>
 
 </div>
@@ -315,7 +315,7 @@ document
     () => {
 
         location.href =
-            "index.html";
+            "/";
     }
 );
 
@@ -331,7 +331,7 @@ if (!raw) {
     );
 
     location.href =
-        "index.html";
+        "/";
 
     throw new Error(
         "Missing result"
@@ -389,7 +389,7 @@ document
             );
 
                 location.href =
-                "game.html?replay=1";
+                "/game?replay=1";
     }
 );
 
