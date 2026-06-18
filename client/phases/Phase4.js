@@ -3,7 +3,7 @@ import SpinPattern from "../../shared/patterns/SpinPattern.js";
 
 export default class Phase4 {
 
-    constructor(canvas, boss, rng) {
+    constructor(boss) {
 
         this.patterns = [
             new CirclePattern(boss),
