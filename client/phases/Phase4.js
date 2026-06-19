@@ -5,6 +5,8 @@ export default class Phase4 {
 
     constructor(boss) {
 
+        console.log(boss);
+        
         this.patterns = [
             new CirclePattern(boss),
             new SpinPattern(boss)
@@ -18,6 +20,11 @@ export default class Phase4 {
         for (const pattern of this.patterns) {
 
             const bullets = pattern.update(deltaTime);
+
+            console.log(
+                pattern.constructor.name,
+                bullets.length
+            );
 
             spawned.push(...bullets);
         }

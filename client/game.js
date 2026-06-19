@@ -409,9 +409,7 @@ function updateGame(deltaTime) {
         !(phase instanceof Phase4)
     ) {
         phase = new Phase4(
-            canvas,
-            boss,
-            rng
+            boss
         );
     }
 

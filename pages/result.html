@@ -319,52 +319,7 @@ transform:
 import {
     showAchievement
 }
-from "./achievementToast.js";
-
-const unlocked =
-
-    JSON.parse(
-
-        sessionStorage.getItem(
-            "newAchievements"
-        ) || "[]"
-    );
-
-unlocked.forEach(
-    achievement => {
-
-        showAchievement(
-            achievement
-        );
-    }
-);
-
-const achievementBox =
-
-    document.getElementById(
-        "newAchievements"
-    );
-
-if(
-    unlocked.length > 0
-){
-
-    achievementBox.innerHTML =
-
-        "<h2>새 업적</h2>" +
-
-        unlocked.map(
-
-            x =>
-            `<div>${x}</div>`
-
-        ).join("");
-
-}else{
-
-    achievementBox.innerHTML =
-        "";
-}
+from "../client/achievementToast.js";
 
 document
 .getElementById(

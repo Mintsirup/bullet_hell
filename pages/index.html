@@ -200,6 +200,10 @@ button:active{
     게임 시작
 </button>
 
+<button id="hardcoreBtn">
+    하드코어
+</button>
+
 <button
     id="leaderboardBtn"
     class="secondary">
@@ -234,6 +238,11 @@ button:active{
 </div>
 
 <script>
+
+sessionStorage.setItem(
+    "hardcore",
+    "1"
+);
 
 document
 .getElementById(

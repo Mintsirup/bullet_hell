@@ -274,6 +274,9 @@ app.post(
             password
         } = req.body;
 
+        const users =
+            loadUsers();
+
         if (
             !username ||
             !password
@@ -301,9 +304,6 @@ app.post(
                     "아이디는 2~16자"
             });
         }
-
-        const users =
-            loadUsers();
 
         if (
             users.find(
@@ -343,7 +343,11 @@ app.post(
                 totalSurvivalTime: 0
             },
 
-            achievements: []
+            achievements: [],
+
+            friends:[],
+
+            friendRequests:[]
         });
 
         saveUsers(users);
@@ -395,8 +399,6 @@ app.post(
     }
 );
 
-const unlocked = [];
-
 app.post(
     "/submitReplay",
     (req, res) => {
@@ -412,6 +414,17 @@ app.post(
             } = req.body;
 
             const unlocked = [];
+
+            const users =
+                loadUsers();
+
+
+            const user =
+                users.find(
+                    x =>
+                        x.username ===
+                        username
+                );
 
             const ranks = [
 
@@ -483,15 +496,6 @@ app.post(
                 });
             }
 
-            const users =
-                loadUsers();
-
-            const user =
-                users.find(
-                    x =>
-                        x.username ===
-                        username
-                );
 
             if (user) {
 
@@ -524,7 +528,6 @@ app.post(
                         user.stats.highestRank
                     )
                 ) {
-
                     user.stats.highestRank =
                         result.rank;
                 }
@@ -535,12 +538,10 @@ app.post(
                         "FIRST_GAME"
                     )
                 ) {
-
                     unlockAchievement(
                         user,
                         "FIRST_GAME"
                     );
-
                     unlocked.push(
                         "🎮 첫 플레이"
                     );
@@ -551,18 +552,15 @@ app.post(
                     result.rank === "S" ||
                     result.rank === "S+"
                 ) {
-
                     if (
                         !user.achievements.includes(
                             "GET_S"
                         )
                     ) {
-
                         unlockAchievement(
                             user,
                             "GET_S"
                         );
-
                         unlocked.push(
                             "⭐ S 랭크 달성"
                         );
@@ -573,18 +571,15 @@ app.post(
                 if (
                     result.rank === "S+"
                 ) {
-
                     if (
                         !user.achievements.includes(
                             "GET_S_PLUS"
                         )
                     ) {
-
                         unlockAchievement(
                             user,
                             "GET_S_PLUS"
                         );
-
                         unlocked.push(
                             "👑 S+ 랭크 달성"
                         );
@@ -596,18 +591,15 @@ app.post(
                     result.score >=
                     1000000
                 ) {
-
                     if (
                         !user.achievements.includes(
                             "ONE_MILLION"
                         )
                     ) {
-
                         unlockAchievement(
                             user,
                             "ONE_MILLION"
                         );
-
                         unlocked.push(
                             "💰 백만점 달성"
                         );
@@ -618,18 +610,15 @@ app.post(
                 if (
                     result.hp >= 100
                 ) {
-
                     if (
                         !user.achievements.includes(
                             "FULL_HP"
                         )
                     ) {
-
                         unlockAchievement(
                             user,
                             "FULL_HP"
                         );
-
                         unlocked.push(
                             "❤️ 풀피 클리어"
                         );
@@ -641,18 +630,15 @@ app.post(
                     user.stats.gamesPlayed >=
                     100
                 ) {
-
                     if (
                         !user.achievements.includes(
                             "PLAY_100"
                         )
                     ) {
-
                         unlockAchievement(
                             user,
                             "PLAY_100"
                         );
-
                         unlocked.push(
                             "🎯 100판 플레이"
                         );
@@ -703,6 +689,227 @@ app.post(
                 success: false
             });
         }
+    }
+);
+
+app.post(
+    "/api/friend/request",
+    (req,res)=>{
+
+        const {
+            from,
+            to
+        } = req.body;
+
+        const users =
+            loadUsers();
+
+        const sender =
+            users.find(
+                x =>
+                x.username === from
+            );
+
+        const target =
+            users.find(
+                x =>
+                x.username === to
+            );
+
+        if(
+            !sender ||
+            !target
+        ){
+            return res.json({
+
+                success:false
+            });
+        }
+
+        if(
+            target.friendRequests.includes(
+                from
+            )
+        ){
+            return res.json({
+
+                success:false
+            });
+        }
+
+        if(from === to){
+
+            return res.json({
+                success:false
+            });
+        }
+
+        if(
+            target.friends.includes(from)
+        ) {
+
+            return res.json({
+                success:false
+            });
+        }
+
+        if(
+            target.friendRequests.includes(from)
+        ) {
+
+            return res.json({
+                success:false
+            });
+        }
+
+        target.friendRequests.push(
+            from
+        );
+
+        saveUsers(users);
+
+        res.json({
+
+            success:true
+        });
+    }
+);
+
+app.post(
+    "/api/friend/accept",
+    (req,res)=>{
+
+        const {
+            username,
+            friend
+        } = req.body;
+
+        const users =
+            loadUsers();
+
+        const user =
+            users.find(
+                x =>
+                x.username === username
+            );
+
+        const target =
+            users.find(
+                x =>
+                x.username === friend
+            );
+
+        if(
+            !user ||
+            !target
+        ){
+            return res.json({
+
+                success:false
+            });
+        }
+
+        user.friendRequests =
+            user.friendRequests.filter(
+                x =>
+                x !== friend
+            );
+
+        if(
+            user.friends.includes(
+                friend
+            )
+        ) {
+            return res.json({
+
+                success:false
+            });
+        }
+
+        user.friends.push(
+            friend
+        );
+
+        target.friends.push(
+            username
+        );
+
+        saveUsers(users);
+
+        res.json({
+
+            success:true
+        });
+    }
+);
+
+app.get(
+    "/api/friends/:username",
+    (req,res)=>{
+
+        const users =
+            loadUsers();
+
+        const user =
+            users.find(
+                x =>
+                x.username ===
+                req.params.username
+            );
+
+        if(!user){
+
+            return res.json({
+
+                friends: [],
+                requests: []
+            });
+        }
+
+        res.json({
+
+            friends:
+                user.friends,
+
+            requests:
+                user.friendRequests
+        });
+    }
+);
+
+app.get(
+    "/api/user/:username",
+    (req,res)=>{
+
+        const users =
+            loadUsers();
+
+        const user =
+            users.find(
+                x =>
+                x.username ===
+                req.params.username
+            );
+
+        if(!user){
+
+            return res
+            .status(404)
+            .json({
+                success:false
+            });
+        }
+
+        res.json({
+
+            success:true,
+
+            username:
+                user.username,
+
+            stats:
+                user.stats
+        });
     }
 );
 

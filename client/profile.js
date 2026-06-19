@@ -1,81 +1,33 @@
 const achievementNames = {
 
-    first_play:
-        "🎮 첫 플레이",
-
-    first_clear:
-        "🏆 첫 클리어",
-
-    rank_c:
-        "🥉 C랭크",
-
-    rank_b:
-        "🥈 B랭크",
-
-    rank_a:
-        "🥇 A랭크",
-
-    rank_s:
-        "💎 S랭크",
-
-    rank_s_plus:
-        "👑 S+랭크",
-
-    score_300k:
-        "300K 점수",
-
-    score_500k:
-        "500K 점수",
-
-    score_800k:
-        "800K 점수",
-
-    million_score:
-        "💰 백만점",
-
-    survivor_30:
-        "30초 생존",
-
-    survivor_60:
-        "60초 생존",
-
-    survivor_120:
-        "120초 생존",
-
-    full_hp_clear:
-        "❤️ 노데미지",
-
-    phase4_reached:
-        "⚔️ Phase4 도달",
-
-    phase4_master:
-        "🔥 Phase4 정복",
-
-    replay_uploaded:
-        "📼 리플레이 등록"
+    FIRST_GAME: "🎮 첫 플레이",
+    GET_S: "⭐ S 랭크",
+    GET_S_PLUS: "👑 S+ 랭크",
+    ONE_MILLION: "💰 백만점",
+    FULL_HP: "❤️ 풀피 클리어",
+    PLAY_100: "🎯 100판 플레이",
+    MILLION_DODGE: "🌀 100만 회피"
 };
 
-async function loadProfile(){
+const username =
+    localStorage.getItem(
+        "username"
+    );
 
-    const username =
-        localStorage.getItem(
-            "username"
-        );
+if (!username) {
 
-    if(!username){
+    location.href =
+        "/login";
+}
 
-        location.href =
-            "/login";
-
-        return;
-    }
+async function loadProfile() {
 
     const response =
         await fetch(
             `/api/profile/${username}`
         );
 
-    if(!response.ok){
+    if (!response.ok) {
 
         alert(
             "프로필을 불러올 수 없음"
@@ -127,7 +79,9 @@ async function loadProfile(){
         "totalSurvival"
     )
     .textContent =
-        `총 생존 시간: ${Math.floor(data.stats.totalSurvivalTime)}초`;
+        `총 생존 시간: ${Math.floor(
+            data.stats.totalSurvivalTime
+        )}초`;
 
     const list =
         document.getElementById(
@@ -136,32 +90,311 @@ async function loadProfile(){
 
     list.innerHTML = "";
 
-    data.achievements.forEach(
-        achievement => {
+    Object.entries(
+        achievementNames
+    ).forEach(
 
-            const div =
+        ([id, text]) => {
+
+            const unlocked =
+
+                data.achievements.includes(
+                    id
+                );
+
+            const card =
                 document.createElement(
                     "div"
                 );
 
-            div.className =
-                "achievement";
+            card.className =
+                unlocked
+                ? "achievementCard"
+                : "achievementCard locked";
 
-            div.textContent =
-                "✓ " +
-                (
-                    achievementNames[
-                        achievement
-                    ]
-                    ||
-                    achievement
-                );
+            const icon =
+                text.split(" ")[0];
+
+            const title =
+                text.substring(
+                    icon.length
+                ).trim();
+
+            card.innerHTML =
+            `
+            <div class="achievementIcon">
+                ${icon}
+            </div>
+
+            <div class="achievementTitle">
+                ${title}
+            </div>
+            `;
 
             list.appendChild(
-                div
+                card
             );
         }
     );
 }
 
+async function loadFriends() {
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/friends/${username}`
+            );
+
+        const data =
+            await response.json();
+
+        console.log(data);
+
+        const friends =
+            data.friends || [];
+
+        const requests =
+            data.requests || [];
+
+        const friendsDiv =
+            document.getElementById(
+                "friends"
+            );
+
+        friendsDiv.innerHTML = "";
+
+        friends.forEach(
+            friend => {
+
+                const div =
+                    document.createElement(
+                        "div"
+                    );
+
+                div.className =
+                    "friendCard";
+
+                div.textContent =
+                    friend;
+
+                friendsDiv.appendChild(
+                    div
+                );
+            }
+        );
+
+        const requestsDiv =
+            document.getElementById(
+                "requests"
+            );
+
+        requestsDiv.innerHTML = "";
+
+        requests.forEach(
+            request => {
+
+                const card =
+                    document.createElement(
+                        "div"
+                    );
+
+                card.className =
+                    "requestCard";
+
+                card.innerHTML =
+                `
+                <span>
+                    ${request}
+                </span>
+
+                <button
+                    class="acceptBtn"
+                >
+                    수락
+                </button>
+                `;
+
+                const button =
+                    card.querySelector(
+                    ".acceptBtn"
+                );
+
+                button.onclick =
+                async () => {
+
+                    const response =
+                        await fetch(
+
+                            "/api/friend/accept",
+
+                            {
+                                method:"POST",
+
+                                headers:{
+                                    "Content-Type":
+                                        "application/json"
+                                },
+
+                                body:
+                                JSON.stringify({
+
+                                    username,
+
+                                    friend:
+                                        request
+                                })
+                            }
+                        );
+
+                    const data =
+                        await response.json();
+
+                    if(
+                        data.success
+                    ){
+
+                        alert(
+                            "친구 추가 완료"
+                        );
+
+                        loadFriends();
+
+                    }else{
+
+                        alert(
+                            "친구 추가 실패"
+                        );
+                    }
+                };
+
+                requestsDiv.appendChild(
+                    card
+                );
+            }
+        );
+
+    } catch(err){
+
+        console.error(err);
+    }
+}
+
+document
+.getElementById(
+    "addFriend"
+)
+.onclick =
+async () => {
+
+    const friend =
+
+        document
+        .getElementById(
+            "friendName"
+        )
+        .value
+        .trim();
+
+    if (!friend)
+        return;
+
+    await fetch(
+
+        "/api/friend/request",
+
+        {
+            method:"POST",
+
+            headers:{
+                "Content-Type":
+                    "application/json"
+            },
+
+            body:
+            JSON.stringify({
+
+                from:
+                    username,
+
+                to:
+                    friend
+            })
+        }
+    );
+
+    alert(
+        "친구 요청 보냄"
+    );
+
+    document
+    .getElementById(
+        "friendName"
+    )
+    .value = "";
+
+    loadFriends();
+};
+
+document
+.getElementById(
+    "searchBtn"
+)
+.onclick =
+async()=>{
+
+    const username =
+
+        document
+        .getElementById(
+            "searchName"
+        )
+        .value;
+
+    const res =
+        await fetch(
+            `/api/user/${username}`
+        );
+
+    const data =
+        await res.json();
+
+    if(!data.success){
+
+        alert(
+            "유저 없음"
+        );
+
+        return;
+    }
+
+    document
+        .getElementById(
+            "searchResult"
+        )
+        .innerHTML =
+
+        `
+        <div class="userCard">
+
+            <h3>
+                ${data.username}
+            </h3>
+
+            <p>
+                최고 점수 :
+                ${data.stats.highestScore}
+            </p>
+
+            <p>
+                최고 랭크 :
+                ${data.stats.highestRank}
+            </p>
+
+        </div>
+        `;
+};
+
 loadProfile();
+loadFriends();

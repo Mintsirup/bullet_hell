@@ -3,13 +3,16 @@
         "username": "mintiua",
         "password": "mint",
         "stats": {
-            "gamesPlayed": 0,
-            "highestScore": 0,
-            "highestRank": "F",
-            "totalBulletsDodged": 0,
-            "totalBulletsHit": 0,
-            "totalSurvivalTime": 0
+            "gamesPlayed": 2,
+            "highestScore": 987935,
+            "highestRank": "S",
+            "totalBulletsDodged": 36975,
+            "totalBulletsHit": 18,
+            "totalSurvivalTime": 480.0333333334996
         },
-        "achievements": []
+        "achievements": [
+            "FIRST_GAME",
+            "GET_S"
+        ]
     }
 ]
