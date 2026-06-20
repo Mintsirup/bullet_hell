@@ -1,90 +1,10 @@
 [
     {
-        "id": "78af784c-6559-44ca-9231-2afb512a39fb",
-        "name": "mintiua",
-        "score": 950246,
-        "rank": "S",
-        "mode": "normal",
-        "time": 1781974060692
-    },
-    {
         "id": "474fdd72-9096-4e7c-acb4-7078651b107d",
         "name": "mintiua",
         "score": 930648,
         "rank": "S",
         "mode": "normal",
         "time": 1781974859685
-    },
-    {
-        "id": "c6621311-8436-4f60-b3d7-d05cf609a73e",
-        "name": "mintiua",
-        "score": 538248,
-        "rank": "HC-C",
-        "mode": "hardcore",
-        "time": 1781973810919
-    },
-    {
-        "id": "96e95783-55c1-4cf1-9e4c-b6d556361a37",
-        "name": "mintiua",
-        "score": 508617,
-        "rank": "HC-C",
-        "mode": "hardcore",
-        "time": 1781967724006
-    },
-    {
-        "id": "bd84b496-75cd-4091-9a52-b16040d7ab2a",
-        "name": "mintiua",
-        "score": 437205,
-        "rank": "HC-D",
-        "mode": "hardcore",
-        "time": 1781973716218
-    },
-    {
-        "id": "577d6a57-768b-4508-b681-066474b87582",
-        "name": "mintiua",
-        "score": 398627,
-        "rank": "HC-D",
-        "mode": "hardcore",
-        "time": 1781968624302
-    },
-    {
-        "id": "6ce42e07-9c76-4c0b-8267-3e1c2af08d02",
-        "name": "mintiua",
-        "score": 398397,
-        "rank": "HC-D",
-        "mode": "hardcore",
-        "time": 1781973593761
-    },
-    {
-        "id": "e0a75f1d-1372-4440-b5e5-7b5dd504b602",
-        "name": "mintiua",
-        "score": 299896,
-        "rank": "HC-F",
-        "mode": "hardcore",
-        "time": 1781968011207
-    },
-    {
-        "id": "e7de1bbe-598d-4c8a-8cb4-d264bd54bae8",
-        "name": "mintiua",
-        "score": 169636,
-        "rank": "HC-F",
-        "mode": "hardcore",
-        "time": 1781968153756
-    },
-    {
-        "id": "aa4bb2be-2dca-435f-bba1-39b6a4f1f278",
-        "name": "mintiua",
-        "score": 153683,
-        "rank": "HC-F",
-        "mode": "hardcore",
-        "time": 1781973512155
-    },
-    {
-        "id": "2592423c-cefc-4c5c-a7cb-be7317e52dc6",
-        "name": "mintiua",
-        "score": 152966,
-        "rank": "HC-F",
-        "mode": "hardcore",
-        "time": 1781968144812
     }
 ]
