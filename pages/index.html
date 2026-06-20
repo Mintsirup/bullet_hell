@@ -200,7 +200,10 @@ button:active{
     게임 시작
 </button>
 
-<button id="hardcoreBtn">
+<button 
+    id="hardcoreBtn"
+    class="secondary">
+    
     하드코어
 </button>
 
@@ -238,11 +241,6 @@ button:active{
 </div>
 
 <script>
-
-sessionStorage.setItem(
-    "hardcore",
-    "1"
-);
 
 document
 .getElementById(
@@ -321,6 +319,43 @@ if (!username) {
         .appendChild(
             logoutBtn
         );
+
+    const hardcoreBtn =
+        document.getElementById(
+            "hardcoreBtn"
+        );
+
+    fetch(
+
+        `/api/hardcore-unlock/${username}`
+
+    )
+
+    .then(
+        r => r.json()
+    )
+
+    .then(
+        data => {
+
+            if(
+                !data.unlocked
+            ) {
+
+                hardcoreBtn.disabled =
+                    true;
+
+                hardcoreBtn.textContent =
+                    "하드코어 (S 필요)";
+
+                hardcoreBtn.style.opacity =
+                    "0.5";
+
+                hardcoreBtn.style.cursor =
+                    "not-allowed";
+            }
+        }
+    );
 }
 
 document
@@ -333,6 +368,32 @@ document
     sessionStorage.setItem(
         "nickname",
         username
+    );
+
+    sessionStorage.setItem(
+        "hardcore",
+        "0"
+    );
+
+    location.href =
+        "/game";
+};
+
+document
+.getElementById(
+    "hardcoreBtn"
+)
+.onclick =
+() => {
+
+    sessionStorage.setItem(
+        "nickname",
+        username
+    );
+
+    sessionStorage.setItem(
+        "hardcore",
+        "1"
     );
 
     location.href =

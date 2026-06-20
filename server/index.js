@@ -463,6 +463,33 @@ app.post(
                 });
             }
 
+            if(
+
+                result.mode ===
+                "hardcore"
+
+            ) {
+
+                if(
+
+                    user.stats.highestRank !== "S"
+
+                    &&
+
+                    user.stats.highestRank !== "S+"
+
+                ) {
+
+                    return res.json({
+
+                        success:false,
+
+                        error:
+                            "하드코어 미해금"
+                    });
+                }
+            }
+
             const success =
                 addScore({
 
@@ -475,14 +502,14 @@ app.post(
                     rank:
                         result.rank,
 
-                    seed,
-
-                    replayData,
+                    mode:
+                        result.mode,
 
                     replayHash,
 
-                    time:
-                        Date.now()
+                    seed,
+
+                    replayData
                 });
 
             if (!success) {
@@ -668,6 +695,79 @@ app.post(
                     }
                 }
 
+                // 하드코어 클리어
+                if(
+
+                    result.mode ===
+                    "hardcore"
+
+                    &&
+
+                    result.cleared === true
+
+                ) {
+
+                    if(
+
+                        !user.achievements.includes(
+                            "HARDCORE_CLEAR"
+                        )
+
+                    ) {
+
+                        unlockAchievement(
+
+                            user,
+
+                            "HARDCORE_CLEAR"
+                        );
+
+                        unlocked.push(
+                            "🔥 하드코어 클리어"
+                        );
+                    }
+                }
+
+                // 하드코어 S
+
+                if(
+
+                    result.mode ===
+                    "hardcore"
+
+                    &&
+
+                    (
+                        result.rank === "HC-S"
+
+                        ||
+
+                        result.rank === "HC-S+"
+                    )
+
+                ) {
+
+                    if(
+
+                        !user.achievements.includes(
+                            "HARDCORE_S"
+                        )
+
+                    ) {
+
+                        unlockAchievement(
+
+                            user,
+
+                            "HARDCORE_S"
+                        );
+
+                        unlocked.push(
+                            "⚡ 하드코어 S 랭크"
+                        );
+                    }
+                }
+
                 saveUsers(users);
             }
 
@@ -689,6 +789,43 @@ app.post(
                 success: false
             });
         }
+    }
+);
+
+app.get(
+    "/api/hardcore-unlock/:username",
+    (req,res)=>{
+
+        const users =
+            loadUsers();
+
+        const user =
+            users.find(
+                x =>
+                x.username ===
+                req.params.username
+            );
+
+        if(!user){
+
+            return res.json({
+
+                unlocked:false
+            });
+        }
+
+        const unlocked =
+
+            user.stats.highestRank === "S"
+
+            ||
+
+            user.stats.highestRank === "S+";
+
+        res.json({
+
+            unlocked
+        });
     }
 );
 
@@ -911,10 +1048,16 @@ app.get(
 
 app.get(
     "/api/leaderboard",
-    (req, res) => {
+    (req,res)=>{
+
+        const mode =
+            req.query.mode;
 
         res.json(
-            getLeaderboard()
+
+            getLeaderboard(
+                mode
+            )
         );
     }
 );

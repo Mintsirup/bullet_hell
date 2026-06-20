@@ -1,9 +1,15 @@
-import ManyCirclePattern from "../../shared/patterns/ManyCirclePattern.js";
-import SpinPattern from "../../shared/patterns/SpinPattern.js"
+import ManyCirclePattern from "../../../shared/patterns/ManyCirclePattern.js";
+import SpinPattern from "../../../shared/patterns/SpinPattern.js"
 
 export default class Phase2 {
 
-    constructor(boss) {
+    constructor(canvas, boss, rng) {
+
+        this.phaseNumber = 2;
+
+        this.canvas = canvas;
+        this.boss = boss;
+        this.rng = rng;
 
         this.patterns = [
             new ManyCirclePattern(boss),

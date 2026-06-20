@@ -2,7 +2,8 @@ async function loadLeaderboard() {
 
     const response =
         await fetch(
-            "/api/leaderboard"
+
+            `/api/leaderboard?mode=${currentMode}`
         );
 
     const data =
@@ -12,6 +13,9 @@ async function loadLeaderboard() {
         data
     );
 }
+
+let currentMode =
+    "normal";
 
 function renderLeaderboard(data) {
 
@@ -201,5 +205,44 @@ function renderLeaderboard(data) {
         }
     );
 }
+
+document
+.getElementById(
+    "normalBtn"
+)
+.onclick = ()=>{
+
+    currentMode =
+        "normal";
+
+    loadLeaderboard();
+};
+
+document
+.getElementById(
+    "hardcoreBtn"
+)
+.onclick = ()=>{
+
+    currentMode =
+        "hardcore";
+
+    loadLeaderboard();
+};
+
+document
+.getElementById(
+    "backBtn"
+)
+.addEventListener(
+
+    "click",
+
+    ()=>{
+
+        location.href =
+            "/";
+    }
+);
 
 loadLeaderboard();

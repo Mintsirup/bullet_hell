@@ -3,12 +3,12 @@
         "username": "mintiua",
         "password": "mint",
         "stats": {
-            "gamesPlayed": 2,
-            "highestScore": 987935,
+            "gamesPlayed": 1,
+            "highestScore": 930648,
             "highestRank": "S",
-            "totalBulletsDodged": 36975,
-            "totalBulletsHit": 18,
-            "totalSurvivalTime": 480.0333333334996
+            "totalBulletsDodged": 19601,
+            "totalBulletsHit": 46,
+            "totalSurvivalTime": 240.0166666667498
         },
         "achievements": [
             "FIRST_GAME",
@@ -17,7 +17,7 @@
         "friends": [],
         "friendRequests": []
     },
-    { 
+    {
         "username": "이다인",
         "password": "0903",
         "stats": {

@@ -45,19 +45,33 @@ const hpScore =
 const dodgeScore =
     dodgeRatio * 150000;
 
-const score =
+let score =
     Math.floor(
         survivalScore +
         hpScore +
         dodgeScore
     );
 
+const hardcore =
+
+    sessionStorage.getItem(
+        "hardcore"
+    ) === "1";
+
+let rank =
+    getRank(score);
+
+if(hardcore){
+
+    rank =
+        "HC-" + rank;
+}
+
 return {
 
     score,
 
-    rank:
-        getRank(score),
+    rank,
 
     bulletsDodged
 };

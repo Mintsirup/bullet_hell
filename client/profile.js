@@ -6,7 +6,9 @@ const achievementNames = {
     ONE_MILLION: "💰 백만점",
     FULL_HP: "❤️ 풀피 클리어",
     PLAY_100: "🎯 100판 플레이",
-    MILLION_DODGE: "🌀 100만 회피"
+    MILLION_DODGE: "🌀 100만 회피",
+    HARDCORE_CLEAR: "☠️ 하드코어 클리어",
+    HARDCORE_S: "🔥 하드코어 S랭크"
 };
 
 const username =

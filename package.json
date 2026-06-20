@@ -4,7 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon server/index.js"
+    "start": "nodemon --ignore data/* --ignore data/replays/* server/index.js"
   },
   "dependencies": {
     "cors": "^2.8.6",

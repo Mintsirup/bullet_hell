@@ -1,11 +1,13 @@
-import CirclePattern from "../../shared/patterns/CirclePattern.js";
-import RainPattern from "../../shared/patterns/RainPattern.js";
-import SpinPattern from "../../shared/patterns/SpinPattern.js";
-import WallPattern from "../../shared/patterns/WallPattern.js";
+import CirclePattern from "../../../shared/patterns/CirclePattern.js";
+import RainPattern from "../../../shared/patterns/RainPattern.js";
+import SpinPattern from "../../../shared/patterns/SpinPattern.js";
+import WallPattern from "../../../shared/patterns/WallPattern.js";
 
 export default class Phase3 {
 
     constructor(canvas, boss, rng) {
+
+        this.phaseNumber = 3;
 
         this.canvas = canvas;
         this.boss = boss;

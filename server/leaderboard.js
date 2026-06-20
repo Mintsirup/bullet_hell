@@ -141,6 +141,9 @@ export function addScore(
         rank:
             entry.rank,
 
+        mode:
+            entry.mode,
+
         time:
             Date.now()
     });
@@ -169,7 +172,20 @@ leaderboard.forEach(
     }
 );
 
-export function getLeaderboard() {
+export function getLeaderboard(
+    mode = null
+) {
 
-    return leaderboard;
+    if(!mode){
+
+        return leaderboard;
+    }
+
+    return leaderboard.filter(
+
+        entry =>
+
+            entry.mode ===
+            mode
+    );
 }

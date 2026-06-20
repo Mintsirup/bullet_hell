@@ -7,10 +7,10 @@ import {drawPlayer} from "./playerRenderer.js"
 import {calculateScore} from "../shared/ScoreCalculator.js";
 
 // 패턴 불러오기
-import Phase1 from "./phases/Phase1.js";
-import Phase2 from "./phases/Phase2.js";
-import Phase3 from "./phases/Phase3.js";
-import Phase4 from "./phases/Phase4.js";
+import Phase1 from "./phases/normal/Phase1.js";
+import Phase2 from "./phases/normal/Phase2.js";
+import Phase3 from "./phases/normal/Phase3.js";
+import Phase4 from "./phases/normal/Phase4.js";
 
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
@@ -183,7 +183,16 @@ const boss = new Boss(
     100
 );
 
-let phase = new Phase1(boss);
+import getPhase
+    from "../shared/getPhase.js";
+
+let phase =
+    getPhase(
+        1,
+        boss,
+        canvas,
+        rng
+    );
 
 let lastTime = 0;
 
@@ -218,7 +227,7 @@ window.addEventListener(
 
 resize();
 
-async function finishGame() {
+async function finishGame(cleared = false) {
 
     if (gameEnded) return;
 
@@ -261,6 +270,8 @@ async function finishGame() {
             player
         ),
 
+        cleared,
+
         survivedTime:
             gameStats.survivedTime,
 
@@ -283,6 +294,17 @@ async function finishGame() {
         seed,
         replayData
     };
+
+    const hardcore =
+
+        sessionStorage.getItem(
+            "hardcore"
+        ) === "1";
+
+    result.mode =
+        hardcore
+            ? "hardcore"
+            : "normal";
 
     try {
 
@@ -385,32 +407,17 @@ function updateGame(deltaTime) {
     boss.update(deltaTime);
 
     if (
-        boss.phase === 2 &&
-        !(phase instanceof Phase2)
+        phase.phaseNumber !==
+        boss.phase
     ) {
-        phase = new Phase2(
-            boss
-        );
-    }
 
-    if (
-        boss.phase === 3 &&
-        !(phase instanceof Phase3)
-    ) {
-        phase = new Phase3(
-            canvas,
-            boss,
-            rng
-        );
-    }
-
-    if (
-        boss.phase === 4 &&
-        !(phase instanceof Phase4)
-    ) {
-        phase = new Phase4(
-            boss
-        );
+        phase =
+            getPhase(
+                boss.phase,
+                boss,
+                canvas,
+                rng
+            );
     }
 
     const spawned =
@@ -458,7 +465,9 @@ function updateGame(deltaTime) {
     ) {
 
         console.trace("finishGame called");
-        finishGame();
+
+        finishGame(false);
+
         return;
     }
 
@@ -467,7 +476,8 @@ function updateGame(deltaTime) {
         120
     ) {
 
-        finishGame();
+        finishGame(true);
+
         return;
     }
 }

@@ -1,10 +1,16 @@
-import CirclePattern from "../../shared/patterns/CirclePattern.js";
+import CirclePattern from "../../../shared/patterns/CirclePattern.js";
 
-import boss from "../../shared/boss.js"
+import boss from "../../../shared/boss.js"
 
 export default class Phase1 {
 
-    constructor(boss) {
+    constructor(canvas, boss, rng) {
+
+        this.phaseNumber = 1;
+
+        this.canvas = canvas;
+        this.boss = boss;
+        this.rng = rng;
 
         this.patterns = [
             new CirclePattern(boss)

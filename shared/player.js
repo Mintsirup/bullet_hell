@@ -16,8 +16,19 @@ export default class Player {
         this.radius = 8;
         this.speed = 400;
 
-        this.maxHp = 100;
-        this.hp = this.maxHp;
+        const hardcore =
+
+            sessionStorage.getItem(
+                "hardcore"
+            ) === "1";
+
+        this.maxHp =
+            hardcore
+                ? 3
+                : 100;
+
+        this.hp =
+            this.maxHp;
     }
 
     update(deltaTime) {
