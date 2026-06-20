@@ -961,20 +961,6 @@ app.get(
     }
 );
 
-const users =
-    loadUsers();
-
-users.forEach(user => {
-
-    user.friends ??= [];
-
-    user.friendRequests ??= [];
-
-    user.achievements ??= [];
-});
-
-saveUsers(users);
-
 app.listen(
     23333,
     () => {

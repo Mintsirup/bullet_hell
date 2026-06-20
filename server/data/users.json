@@ -1,4 +1,4 @@
-[    
+[
     {
         "username": "mintiua",
         "password": "mint",
@@ -13,9 +13,11 @@
         "achievements": [
             "FIRST_GAME",
             "GET_S"
-        ]
+        ],
+        "friends": [],
+        "friendRequests": []
     },
-    {
+    { 
         "username": "이다인",
         "password": "0903",
         "stats": {
@@ -26,6 +28,8 @@
             "totalBulletsHit": 0,
             "totalSurvivalTime": 0
         },
-        "achievements": []
+        "achievements": [],
+        "friends": [],
+        "friendRequests": []
     }
 ]
