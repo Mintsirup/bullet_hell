@@ -4,12 +4,11 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "nodaemon server/index.js"
+    "start": "nodemon server/index.js"
   },
   "dependencies": {
     "cors": "^2.8.6",
     "express": "^5.2.1",
-    "nodaemon": "^0.0.5",
     "ws": "^8.21.0"
   },
   "devDependencies": {
