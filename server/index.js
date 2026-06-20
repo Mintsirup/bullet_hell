@@ -721,44 +721,41 @@ app.post(
             !target
         ){
             return res.json({
-
-                success:false
+                success:false,
+                error:"유저 없음"
             });
         }
+
+        sender.friends ??= [];
+        sender.friendRequests ??= [];
+
+        target.friends ??= [];
+        target.friendRequests ??= [];
 
         if(
-            target.friendRequests.includes(
-                from
-            )
+            from === to
         ){
             return res.json({
-
-                success:false
-            });
-        }
-
-        if(from === to){
-
-            return res.json({
-                success:false
+                success:false,
+                error:"자기 자신에게 요청 불가"
             });
         }
 
         if(
             target.friends.includes(from)
-        ) {
-
+        ){
             return res.json({
-                success:false
+                success:false,
+                error:"이미 친구"
             });
         }
 
         if(
             target.friendRequests.includes(from)
-        ) {
-
+        ){
             return res.json({
-                success:false
+                success:false,
+                error:"이미 요청 보냄"
             });
         }
 
@@ -769,7 +766,6 @@ app.post(
         saveUsers(users);
 
         res.json({
-
             success:true
         });
     }
@@ -964,6 +960,20 @@ app.get(
         );
     }
 );
+
+const users =
+    loadUsers();
+
+users.forEach(user => {
+
+    user.friends ??= [];
+
+    user.friendRequests ??= [];
+
+    user.achievements ??= [];
+});
+
+saveUsers(users);
 
 app.listen(
     23333,
