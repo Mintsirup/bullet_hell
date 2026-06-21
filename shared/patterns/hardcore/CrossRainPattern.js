@@ -2,9 +2,10 @@ import Bullet from "../../bullet.js";
 
 export default class CrossRainPattern {
 
-    constructor(boss){
+    constructor(boss, rng){
 
         this.boss = boss;
+        this.rng = rng;
         this.timer = 0;
     }
 
@@ -19,10 +20,10 @@ export default class CrossRainPattern {
             this.timer = 0;
 
             const x =
-                Math.random() * 1280;
+                this.rng.next() * 1280;
 
             const y =
-                Math.random() * 720;
+                this.rng.next() * 720;
 
             spawned.push(
 

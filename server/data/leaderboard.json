@@ -1,10 +1,11 @@
 [
     {
-        "id": "474fdd72-9096-4e7c-acb4-7078651b107d",
+        "id": "8362cb9c-c169-428b-bcf9-31923c40efe9",
         "name": "mintiua",
-        "score": 930648,
-        "rank": "S",
-        "mode": "normal",
-        "time": 1781974859685
+        "score": 674588,
+        "rank": "HC-B",
+        "mode": "hardcore",
+        "replayHash": "a7b63a3e4feb27c090a1cda84c0fa600cadefc33e8c91e3292a913737631719b",
+        "time": 1782050435693
     }
 ]

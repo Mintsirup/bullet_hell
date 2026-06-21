@@ -1,4 +1,3 @@
-import AimPattern from "../../../shared/patterns/hardcore/AimPattern.js";
 import SpiralBurstPattern from "../../../shared/patterns/hardcore/SpiralBurstPattern.js";
 
 export default class HardcorePhase1 {
@@ -10,10 +9,6 @@ export default class HardcorePhase1 {
         this.patterns = [
 
             new SpiralBurstPattern(
-                boss
-            ),
-
-            new AimPattern(
                 boss
             )
         ];

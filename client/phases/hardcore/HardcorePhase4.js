@@ -1,4 +1,3 @@
-import AimPattern from "../../../shared/patterns/hardcore/AimPattern.js";
 import SpiralRainPattern from "../../../shared/patterns/hardcore/SpiralRainPattern.js";
 import ExplosionPattern from "../../../shared/patterns/hardcore/ExplosionPattern.js";
 
@@ -9,10 +8,6 @@ export default class HardcorePhase4 {
         this.phaseNumber = 4;
 
         this.patterns = [
-
-            new AimPattern(
-                boss
-            ),
 
             new SpiralRainPattern(
                 canvas

@@ -309,9 +309,14 @@ async function finishGame(cleared = false) {
     try {
 
         const replayHash =
-            btoa(
-                JSON.stringify(
-                    replayData
+            await crypto.subtle.digest(
+                "SHA-256",
+
+                new TextEncoder().encode(
+
+                    JSON.stringify(
+                        replayData
+                    )
                 )
             );
 

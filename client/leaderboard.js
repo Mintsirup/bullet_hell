@@ -1,17 +1,24 @@
+let lastData = "";
+
 async function loadLeaderboard() {
 
     const response =
         await fetch(
-
-            `/api/leaderboard?mode=${currentMode}`
+            `/api/leaderboard?mode=${currentMode}&t=${Date.now()}`
         );
 
     const data =
         await response.json();
 
-    renderLeaderboard(
-        data
-    );
+    const json =
+        JSON.stringify(data);
+
+    if(json !== lastData){
+
+        lastData = json;
+
+        renderLeaderboard(data);
+    }
 }
 
 let currentMode =
@@ -246,3 +253,8 @@ document
 );
 
 loadLeaderboard();
+
+setInterval(
+    loadLeaderboard,
+    5000
+);

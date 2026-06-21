@@ -17,7 +17,7 @@ export default class ManyCirclePattern {
 
             this.timer = 0;
 
-            const count = 30;
+            const count = 20;
 
             for (let i = 0; i < count; i++) {
 

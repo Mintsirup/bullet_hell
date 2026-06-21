@@ -2,9 +2,10 @@ import Bullet from "../../bullet.js";
 
 export default class ShotgunPattern {
 
-    constructor(boss){
+    constructor(boss, rng){
 
         this.boss = boss;
+        this.rng = rng;
         this.timer = 0;
     }
 
@@ -19,7 +20,7 @@ export default class ShotgunPattern {
             this.timer = 0;
 
             const base =
-                Math.random() *
+                this.rng.next() *
                 Math.PI * 2;
 
             for(let i = -6; i <= 6; i++){

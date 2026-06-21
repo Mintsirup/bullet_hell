@@ -10,7 +10,8 @@ export default class HardcorePhase3 {
         this.patterns = [
 
             new CrossRainPattern(
-                boss
+                boss,
+                rng
             ),
 
             new RingTrapPattern(

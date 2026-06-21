@@ -25,11 +25,11 @@ export default class ExplosionPattern {
             this.timer = 0;
 
             const x =
-                this.rng.nextFloat() *
+                this.rng.next() *
                 this.canvas.width;
 
             const y =
-                this.rng.nextFloat() *
+                this.rng.next() *
                 this.canvas.height;
 
             for(

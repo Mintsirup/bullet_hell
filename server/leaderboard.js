@@ -104,6 +104,16 @@ export function addScore(
         return false;
     }
 
+    if(
+        leaderboard.some(
+            x =>
+            x.replayHash ===
+            entry.replayHash
+        )
+    ) {
+        return false;
+    }
+
     const id =
         crypto.randomUUID();
 
@@ -143,6 +153,9 @@ export function addScore(
 
         mode:
             entry.mode,
+
+        replayHash:
+            entry.replayHash,
 
         time:
             Date.now()
