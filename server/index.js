@@ -5,13 +5,13 @@ import fs from "fs";
 import { fileURLToPath } from "url";
 import crypto from "crypto";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 import {
     addScore,
     getLeaderboard
 } from "./leaderboard.js";
 
-// ─── 서버 사이드 시뮬레이션용 import ───────────────────────────────
 import Bullet from "../shared/bullet.js";
 import Player from "../shared/player.js";
 import Boss from "../shared/boss.js";
@@ -32,7 +32,6 @@ import ShotgunPattern from "../shared/patterns/hardcore/ShotgunPattern.js";
 import SpiralBurstPattern from "../shared/patterns/hardcore/SpiralBurstPattern.js";
 import SpiralRainPattern from "../shared/patterns/hardcore/SpiralRainPattern.js";
 import HardcoreWallPattern from "../shared/patterns/hardcore/WallPattern.js";
-// ────────────────────────────────────────────────────────────────────
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -40,21 +39,70 @@ const __dirname = path.dirname(__filename);
 const DATA_DIR = path.join(__dirname, "data");
 const USERS_FILE = path.join(DATA_DIR, "users.json");
 const LEADERBOARD_FILE = path.join(DATA_DIR, "leaderboard.json");
+const REPLAY_DIR = path.join(DATA_DIR, "replays");
 
-if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-}
-if (!fs.existsSync(USERS_FILE)) {
-    fs.writeFileSync(USERS_FILE, "[]");
-}
-if (!fs.existsSync(LEADERBOARD_FILE)) {
-    fs.writeFileSync(LEADERBOARD_FILE, "[]");
+if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+if (!fs.existsSync(REPLAY_DIR)) fs.mkdirSync(REPLAY_DIR, { recursive: true });
+if (!fs.existsSync(USERS_FILE)) fs.writeFileSync(USERS_FILE, "[]");
+if (!fs.existsSync(LEADERBOARD_FILE)) fs.writeFileSync(LEADERBOARD_FILE, "[]");
+
+// ─── JWT 설정 ────────────────────────────────────────────────────────
+const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(32).toString("hex");
+const JWT_EXPIRES = "7d";
+
+function signToken(username) {
+    return jwt.sign({ username }, JWT_SECRET, { expiresIn: JWT_EXPIRES });
 }
 
-// ─── 서버 사이드 캔버스 스텁 ────────────────────────────────────────
-// Player/Pattern 클래스가 canvas.width/height를 참조하므로 스텁 객체 제공
-const SERVER_CANVAS = { width: 1280, height: 720 };
+// 미들웨어: Authorization: Bearer <token> 헤더에서 유저 추출
+function requireAuth(req, res, next) {
+    const header = req.headers["authorization"] || "";
+    const token = header.startsWith("Bearer ") ? header.slice(7) : null;
+
+    if (!token) {
+        return res.status(401).json({ success: false, error: "로그인 필요" });
+    }
+
+    try {
+        const payload = jwt.verify(token, JWT_SECRET);
+        req.user = payload.username;
+        next();
+    } catch {
+        return res.status(401).json({ success: false, error: "인증 만료 — 다시 로그인하세요" });
+    }
+}
 // ────────────────────────────────────────────────────────────────────
+
+// ─── 동시성 잠금 ─────────────────────────────────────────────────────
+let writeLock = Promise.resolve();
+
+function withUserLock(fn) {
+    writeLock = writeLock.then(fn).catch(fn);
+    return writeLock;
+}
+// ────────────────────────────────────────────────────────────────────
+
+const SERVER_CANVAS = { width: 1280, height: 720 };
+const BCRYPT_ROUNDS = 12;
+const MAX_REPLAY_FRAMES = 10000;
+
+function loadUsers() {
+    try {
+        return JSON.parse(fs.readFileSync(USERS_FILE, "utf8"));
+    } catch {
+        return [];
+    }
+}
+
+function saveUsers(users) {
+    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 4));
+}
+
+const bannedWords = ["시발", "씨발", "병신", "좆", "ㅂㅅ", "새끼"];
+
+function containsBadWord(name) {
+    return bannedWords.some(word => name.includes(word));
+}
 
 function unlockAchievement(user, id) {
     if (!user.achievements.includes(id)) {
@@ -67,7 +115,6 @@ function simulateReplay(seed, replayData, mode) {
 
     const FIXED_DELTA = 1 / 60;
     const rng = new RNG(seed);
-
     const keys = {};
 
     const gameStats = {
@@ -80,8 +127,6 @@ function simulateReplay(seed, replayData, mode) {
     const bullets = [];
     const boss = new Boss(SERVER_CANVAS.width / 2, 100);
 
-    // sessionStorage 없는 서버 환경에서 mode를 직접 주입하기 위해
-    // getPhase 대신 인라인으로 페이즈 생성
     function makePhase(phaseNumber) {
 
         if (mode === "hardcore") {
@@ -90,47 +135,22 @@ function simulateReplay(seed, replayData, mode) {
                 1: () => ({
                     phaseNumber: 1,
                     patterns: [new SpiralBurstPattern(boss)],
-                    update(dt) {
-                        const s = [];
-                        for (const p of this.patterns) s.push(...p.update(dt));
-                        return s;
-                    }
+                    update(dt) { const s = []; for (const p of this.patterns) s.push(...p.update(dt)); return s; }
                 }),
                 2: () => ({
                     phaseNumber: 2,
-                    patterns: [
-                        new HardcoreWallPattern(SERVER_CANVAS),
-                        new ReverseCirclePattern(boss)
-                    ],
-                    update(dt) {
-                        const s = [];
-                        for (const p of this.patterns) s.push(...p.update(dt));
-                        return s;
-                    }
+                    patterns: [new HardcoreWallPattern(SERVER_CANVAS), new ReverseCirclePattern(boss)],
+                    update(dt) { const s = []; for (const p of this.patterns) s.push(...p.update(dt)); return s; }
                 }),
                 3: () => ({
                     phaseNumber: 3,
-                    patterns: [
-                        new CrossRainPattern(boss, rng),
-                        new RingTrapPattern(boss)
-                    ],
-                    update(dt) {
-                        const s = [];
-                        for (const p of this.patterns) s.push(...p.update(dt));
-                        return s;
-                    }
+                    patterns: [new CrossRainPattern(boss, rng), new RingTrapPattern(boss)],
+                    update(dt) { const s = []; for (const p of this.patterns) s.push(...p.update(dt)); return s; }
                 }),
                 4: () => ({
                     phaseNumber: 4,
-                    patterns: [
-                        new SpiralRainPattern(SERVER_CANVAS),
-                        new ExplosionPattern(SERVER_CANVAS, boss, rng)
-                    ],
-                    update(dt) {
-                        const s = [];
-                        for (const p of this.patterns) s.push(...p.update(dt));
-                        return s;
-                    }
+                    patterns: [new SpiralRainPattern(SERVER_CANVAS), new ExplosionPattern(SERVER_CANVAS, boss, rng)],
+                    update(dt) { const s = []; for (const p of this.patterns) s.push(...p.update(dt)); return s; }
                 })
             };
 
@@ -138,9 +158,7 @@ function simulateReplay(seed, replayData, mode) {
 
         } else {
 
-            // normal 모드 Phase3는 changeTimer + getRandomPatterns 패턴을 인라인 구현
             if (phaseNumber === 3) {
-
                 return {
                     phaseNumber: 3,
                     changeTimer: 0,
@@ -162,29 +180,17 @@ function simulateReplay(seed, replayData, mode) {
                 1: () => ({
                     phaseNumber: 1,
                     patterns: [new CirclePattern(boss)],
-                    update(dt) {
-                        const s = [];
-                        for (const p of this.patterns) s.push(...p.update(dt));
-                        return s;
-                    }
+                    update(dt) { const s = []; for (const p of this.patterns) s.push(...p.update(dt)); return s; }
                 }),
                 2: () => ({
                     phaseNumber: 2,
                     patterns: [new ManyCirclePattern(boss), new SpinPattern(boss)],
-                    update(dt) {
-                        const s = [];
-                        for (const p of this.patterns) s.push(...p.update(dt));
-                        return s;
-                    }
+                    update(dt) { const s = []; for (const p of this.patterns) s.push(...p.update(dt)); return s; }
                 }),
                 4: () => ({
                     phaseNumber: 4,
                     patterns: [new CirclePattern(boss), new SpinPattern(boss)],
-                    update(dt) {
-                        const s = [];
-                        for (const p of this.patterns) s.push(...p.update(dt));
-                        return s;
-                    }
+                    update(dt) { const s = []; for (const p of this.patterns) s.push(...p.update(dt)); return s; }
                 })
             };
 
@@ -194,9 +200,7 @@ function simulateReplay(seed, replayData, mode) {
 
     function getRandomNormalPhase3Patterns(rng, boss) {
         const roll = rng.next();
-        if (roll < 0.25) {
-            return [new WallPattern(SERVER_CANVAS, rng)];
-        }
+        if (roll < 0.25) return [new WallPattern(SERVER_CANVAS, rng)];
         const pool = [
             () => new CirclePattern(boss),
             () => new RainPattern(SERVER_CANVAS, rng),
@@ -206,7 +210,6 @@ function simulateReplay(seed, replayData, mode) {
         return [shuffled[0](), shuffled[1]()];
     }
 
-    // keys 스텁 — Player 생성자가 keys 객체를 요구함
     const player = new Player(
         SERVER_CANVAS.width / 2,
         SERVER_CANVAS.height / 2,
@@ -215,7 +218,6 @@ function simulateReplay(seed, replayData, mode) {
         gameStats
     );
 
-    // 하드코어 모드 HP 설정을 sessionStorage 없이 직접 주입
     if (mode === "hardcore") {
         player.maxHp = 3;
         player.hp = 3;
@@ -227,14 +229,10 @@ function simulateReplay(seed, replayData, mode) {
     let gameEnded = false;
     let cleared = false;
 
-    // 최대 프레임 수 제한 (120초 × 60fps = 7200 + 여유)
-    const MAX_FRAMES = 8000;
-
-    while (!gameEnded && frame < MAX_FRAMES) {
+    while (!gameEnded && frame < MAX_REPLAY_FRAMES) {
 
         frame++;
 
-        // 리플레이 입력 재현
         while (
             replayIndex < replayData.length &&
             replayData[replayIndex].frame <= frame
@@ -255,9 +253,7 @@ function simulateReplay(seed, replayData, mode) {
         gameStats.bulletsSpawned += spawned.length;
         gameStats.survivedTime += FIXED_DELTA;
 
-        if (boss.phase === 4) {
-            gameStats.phase4Time += FIXED_DELTA;
-        }
+        if (boss.phase === 4) gameStats.phase4Time += FIXED_DELTA;
 
         player.update(FIXED_DELTA);
 
@@ -274,15 +270,8 @@ function simulateReplay(seed, replayData, mode) {
 
         player.checkHits(bullets);
 
-        if (player.hp <= 0) {
-            gameEnded = true;
-            cleared = false;
-        }
-
-        if (gameStats.phase4Time >= 120) {
-            gameEnded = true;
-            cleared = true;
-        }
+        if (player.hp <= 0) { gameEnded = true; cleared = false; }
+        if (gameStats.phase4Time >= 120) { gameEnded = true; cleared = true; }
     }
 
     const scoreResult = calculateScore(gameStats, player, mode);
@@ -303,7 +292,6 @@ function simulateReplay(seed, replayData, mode) {
 // ────────────────────────────────────────────────────────────────────
 
 const app = express();
-const BCRYPT_ROUNDS = 12;
 
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
@@ -335,109 +323,87 @@ app.get("/api/profile/:username", (req, res) => {
     });
 });
 
-function loadUsers() {
-    try {
-        return JSON.parse(fs.readFileSync(USERS_FILE, "utf8"));
-    } catch {
-        return [];
-    }
-}
-
-function saveUsers(users) {
-    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 4));
-}
-
-const bannedWords = ["시발", "씨발", "병신", "좆", "ㅂㅅ", "새끼"];
-
-function containsBadWord(name) {
-    return bannedWords.some(word => name.includes(word));
-}
-
-// ─── 회원가입 (bcrypt 해싱) ──────────────────────────────────────────
+// ─── 회원가입 ────────────────────────────────────────────────────────
 app.post("/register", async (req, res) => {
     const { username, password } = req.body;
-    const users = loadUsers();
 
-    if (!username || !password) {
+    if (!username || !password)
         return res.json({ success: false, error: "아이디와 비밀번호를 입력하세요" });
-    }
 
-    if (username.length < 2 || username.length > 16) {
+    if (username.length < 2 || username.length > 16)
         return res.json({ success: false, error: "아이디는 2~16자" });
-    }
 
-    if (containsBadWord(username)) {
+    if (containsBadWord(username))
         return res.json({ success: false, error: "사용 불가능한 닉네임" });
-    }
 
-    if (users.find(x => x.username === username)) {
-        return res.json({ success: false, error: "이미 존재하는 아이디" });
-    }
+    await withUserLock(async () => {
+        const users = loadUsers();
 
-    const hashedPassword = await bcrypt.hash(password, BCRYPT_ROUNDS);
+        if (users.find(x => x.username === username)) {
+            return res.json({ success: false, error: "이미 존재하는 아이디" });
+        }
 
-    users.push({
-        username,
-        password: hashedPassword,
-        stats: {
-            gamesPlayed: 0,
-            highestScore: 0,
-            highestRank: "F",
-            totalBulletsDodged: 0,
-            totalBulletsHit: 0,
-            totalSurvivalTime: 0
-        },
-        achievements: [],
-        friends: [],
-        friendRequests: []
+        const hashedPassword = await bcrypt.hash(password, BCRYPT_ROUNDS);
+
+        users.push({
+            username,
+            password: hashedPassword,
+            stats: {
+                gamesPlayed: 0,
+                highestScore: 0,
+                highestRank: "F",
+                totalBulletsDodged: 0,
+                totalBulletsHit: 0,
+                totalSurvivalTime: 0
+            },
+            achievements: [],
+            friends: [],
+            friendRequests: []
+        });
+
+        saveUsers(users);
+
+        const token = signToken(username);
+        res.json({ success: true, token, username });
     });
-
-    saveUsers(users);
-    res.json({ success: true });
 });
 
-// ─── 로그인 (bcrypt 검증) ────────────────────────────────────────────
+// ─── 로그인 ──────────────────────────────────────────────────────────
 app.post("/login", async (req, res) => {
     const { username, password } = req.body;
     const users = loadUsers();
     const user = users.find(x => x.username === username);
 
-    if (!user) {
+    if (!user)
         return res.json({ success: false, error: "아이디 또는 비밀번호 오류" });
-    }
 
     const match = await bcrypt.compare(password, user.password);
 
-    if (!match) {
+    if (!match)
         return res.json({ success: false, error: "아이디 또는 비밀번호 오류" });
-    }
 
-    res.json({ success: true, username });
+    const token = signToken(username);
+    res.json({ success: true, token, username });
 });
 
-// ─── 리플레이 제출 (서버 검증 추가) ─────────────────────────────────
-app.post("/submitReplay", async (req, res) => {
+// ─── 리플레이 제출 (인증 필수) ───────────────────────────────────────
+app.post("/submitReplay", requireAuth, async (req, res) => {
     try {
-        const { seed, replayData, result, username } = req.body;
+        const { seed, replayData, result } = req.body;
+        const username = req.user; // JWT에서 추출 — 클라이언트 값 무시
 
-        if (!username) {
-            return res.json({ success: false, error: "로그인 필요" });
-        }
-
-        if (containsBadWord(username)) {
-            return res.json({ success: false, error: "사용 불가능한 닉네임" });
-        }
-
-        if (!seed || !Array.isArray(replayData)) {
+        if (!seed || !Array.isArray(replayData))
             return res.json({ success: false, error: "잘못된 리플레이" });
-        }
+
+        // ── 크기 제한 ────────────────────────────────────────────────
+        if (replayData.length > MAX_REPLAY_FRAMES)
+            return res.json({ success: false, error: "리플레이가 너무 깁니다" });
 
         const users = loadUsers();
         const user = users.find(x => x.username === username);
 
-        if (!user) {
+        if (!user)
             return res.json({ success: false, error: "유저 없음" });
-        }
 
         const mode = result?.mode ?? "normal";
 
@@ -446,12 +412,10 @@ app.post("/submitReplay", async (req, res) => {
                 user.achievements.includes("GET_S") ||
                 user.achievements.includes("GET_S_PLUS");
 
-            if (!hardcoreUnlocked) {
+            if (!hardcoreUnlocked)
                 return res.json({ success: false, error: "하드코어 미해금" });
-            }
         }
 
-        // ── 서버 사이드 시뮬레이션 ──────────────────────────────────
         let serverResult;
         try {
             serverResult = simulateReplay(seed, replayData, mode);
@@ -460,7 +424,6 @@ app.post("/submitReplay", async (req, res) => {
             return res.json({ success: false, error: "리플레이 검증 실패" });
         }
 
-        // 점수/랭크 불일치 검사 (±5% 허용 — 부동소수점 오차 대응)
         const scoreDiff = Math.abs(serverResult.score - result.score);
         const scoreThreshold = Math.max(serverResult.score * 0.05, 1000);
 
@@ -473,9 +436,7 @@ app.post("/submitReplay", async (req, res) => {
             return res.json({ success: false, error: "리플레이 검증 불일치" });
         }
 
-        // 검증 통과 → 서버 계산 값을 신뢰
         const verifiedResult = serverResult;
-        // ────────────────────────────────────────────────────────────
 
         const realReplayHash = crypto
             .createHash("sha256")
@@ -492,9 +453,8 @@ app.post("/submitReplay", async (req, res) => {
             replayData
         });
 
-        if (!success) {
+        if (!success)
             return res.json({ success: false, error: "이미 등록된 리플레이" });
-        }
 
         const unlocked = [];
 
@@ -507,85 +467,56 @@ app.post("/submitReplay", async (req, res) => {
             return map[rank] ?? 0;
         }
 
-        user.stats.gamesPlayed++;
-        user.stats.totalBulletsDodged += verifiedResult.bulletsDodged || 0;
-        user.stats.totalBulletsHit += verifiedResult.bulletsHit || 0;
-        user.stats.totalSurvivalTime += verifiedResult.survivedTime || 0;
+        await withUserLock(async () => {
+            const users = loadUsers();
+            const user = users.find(x => x.username === username);
+            if (!user) return;
 
-        if (verifiedResult.score > user.stats.highestScore) {
-            user.stats.highestScore = verifiedResult.score;
-        }
+            user.stats.gamesPlayed++;
+            user.stats.totalBulletsDodged += verifiedResult.bulletsDodged || 0;
+            user.stats.totalBulletsHit += verifiedResult.bulletsHit || 0;
+            user.stats.totalSurvivalTime += verifiedResult.survivedTime || 0;
 
-        if (rankValue(verifiedResult.rank) > rankValue(user.stats.highestRank)) {
-            user.stats.highestRank = verifiedResult.rank;
-        }
+            if (verifiedResult.score > user.stats.highestScore)
+                user.stats.highestScore = verifiedResult.score;
 
-        if (!user.achievements.includes("FIRST_GAME")) {
-            unlockAchievement(user, "FIRST_GAME");
-            unlocked.push("🎮 첫 플레이");
-        }
+            if (rankValue(verifiedResult.rank) > rankValue(user.stats.highestRank))
+                user.stats.highestRank = verifiedResult.rank;
 
-        if (verifiedResult.rank === "S" || verifiedResult.rank === "S+") {
-            if (!user.achievements.includes("GET_S")) {
-                unlockAchievement(user, "GET_S");
-                unlocked.push("⭐ S 랭크 달성");
+            if (!user.achievements.includes("FIRST_GAME")) {
+                unlockAchievement(user, "FIRST_GAME"); unlocked.push("🎮 첫 플레이");
             }
-        }
-
-        if (verifiedResult.rank === "S+") {
-            if (!user.achievements.includes("GET_S_PLUS")) {
-                unlockAchievement(user, "GET_S_PLUS");
-                unlocked.push("👑 S+ 랭크 달성");
+            if ((verifiedResult.rank === "S" || verifiedResult.rank === "S+") &&
+                !user.achievements.includes("GET_S")) {
+                unlockAchievement(user, "GET_S"); unlocked.push("⭐ S 랭크 달성");
             }
-        }
-
-        if (verifiedResult.score >= 1000000) {
-            if (!user.achievements.includes("ONE_MILLION")) {
-                unlockAchievement(user, "ONE_MILLION");
-                unlocked.push("💰 백만점 달성");
+            if (verifiedResult.rank === "S+" && !user.achievements.includes("GET_S_PLUS")) {
+                unlockAchievement(user, "GET_S_PLUS"); unlocked.push("👑 S+ 랭크 달성");
             }
-        }
-
-        const maxHp = mode === "hardcore" ? 3 : 100;
-        if (verifiedResult.hp === maxHp) {
-            if (!user.achievements.includes("FULL_HP")) {
-                unlockAchievement(user, "FULL_HP");
-                unlocked.push("❤️ 풀피 클리어");
+            if (verifiedResult.score >= 1000000 && !user.achievements.includes("ONE_MILLION")) {
+                unlockAchievement(user, "ONE_MILLION"); unlocked.push("💰 백만점 달성");
             }
-        }
-
-        if (user.stats.gamesPlayed >= 100) {
-            if (!user.achievements.includes("PLAY_100")) {
-                unlockAchievement(user, "PLAY_100");
-                unlocked.push("🎯 100판 플레이");
+            const maxHp = mode === "hardcore" ? 3 : 100;
+            if (verifiedResult.hp === maxHp && !user.achievements.includes("FULL_HP")) {
+                unlockAchievement(user, "FULL_HP"); unlocked.push("❤️ 풀피 클리어");
             }
-        }
-
-        if (user.stats.totalBulletsDodged >= 1000000) {
-            if (!user.achievements.includes("MILLION_DODGE")) {
-                unlockAchievement(user, "MILLION_DODGE");
-                unlocked.push("🌀 총알 100만 회피");
+            if (user.stats.gamesPlayed >= 100 && !user.achievements.includes("PLAY_100")) {
+                unlockAchievement(user, "PLAY_100"); unlocked.push("🎯 100판 플레이");
             }
-        }
-
-        if (mode === "hardcore" && verifiedResult.cleared === true) {
-            if (!user.achievements.includes("HARDCORE_CLEAR")) {
-                unlockAchievement(user, "HARDCORE_CLEAR");
-                unlocked.push("🔥 하드코어 클리어");
+            if (user.stats.totalBulletsDodged >= 1000000 && !user.achievements.includes("MILLION_DODGE")) {
+                unlockAchievement(user, "MILLION_DODGE"); unlocked.push("🌀 총알 100만 회피");
             }
-        }
-
-        if (
-            mode === "hardcore" &&
-            (verifiedResult.rank === "HC-S" || verifiedResult.rank === "HC-S+")
-        ) {
-            if (!user.achievements.includes("HARDCORE_S")) {
-                unlockAchievement(user, "HARDCORE_S");
-                unlocked.push("⚡ 하드코어 S 랭크");
+            if (mode === "hardcore" && verifiedResult.cleared && !user.achievements.includes("HARDCORE_CLEAR")) {
+                unlockAchievement(user, "HARDCORE_CLEAR"); unlocked.push("🔥 하드코어 클리어");
             }
-        }
+            if (mode === "hardcore" &&
+                (verifiedResult.rank === "HC-S" || verifiedResult.rank === "HC-S+") &&
+                !user.achievements.includes("HARDCORE_S")) {
+                unlockAchievement(user, "HARDCORE_S"); unlocked.push("⚡ 하드코어 S 랭크");
+            }
 
-        saveUsers(users);
+            saveUsers(users);
+        });
 
         res.json({ success: true, result: verifiedResult, unlocked });
 
@@ -598,71 +529,82 @@ app.post("/submitReplay", async (req, res) => {
 app.get("/api/hardcore-unlock/:username", (req, res) => {
     const users = loadUsers();
     const user = users.find(x => x.username === req.params.username);
-
     if (!user) return res.json({ unlocked: false });
-
-    const unlocked =
-        user.achievements.includes("GET_S") ||
-        user.achievements.includes("GET_S_PLUS");
-
-    res.json({ unlocked });
+    res.json({
+        unlocked:
+            user.achievements.includes("GET_S") ||
+            user.achievements.includes("GET_S_PLUS")
+    });
 });
 
-app.post("/api/friend/request", (req, res) => {
-    const { from, to } = req.body;
-    const users = loadUsers();
-    const sender = users.find(x => x.username === from);
-    const target = users.find(x => x.username === to);
+// ─── 친구 요청 (인증 필수) ───────────────────────────────────────────
+app.post("/api/friend/request", requireAuth, async (req, res) => {
+    const from = req.user; // JWT에서 추출
+    const { to } = req.body;
 
-    if (!sender || !target) return res.json({ success: false, error: "유저 없음" });
-
-    sender.friends ??= [];
-    sender.friendRequests ??= [];
-    target.friends ??= [];
-    target.friendRequests ??= [];
-
+    if (!to) return res.json({ success: false, error: "대상 없음" });
     if (from === to) return res.json({ success: false, error: "자기 자신에게 요청 불가" });
-    if (target.friends.includes(from)) return res.json({ success: false, error: "이미 친구" });
-    if (target.friendRequests.includes(from)) return res.json({ success: false, error: "이미 요청 보냄" });
 
-    target.friendRequests.push(from);
-    saveUsers(users);
-    res.json({ success: true });
+    await withUserLock(async () => {
+        const users = loadUsers();
+        const sender = users.find(x => x.username === from);
+        const target = users.find(x => x.username === to);
+
+        if (!sender || !target)
+            return res.json({ success: false, error: "유저 없음" });
+
+        target.friends ??= [];
+        target.friendRequests ??= [];
+        sender.friends ??= [];
+
+        if (target.friends.includes(from))
+            return res.json({ success: false, error: "이미 친구" });
+        if (target.friendRequests.includes(from))
+            return res.json({ success: false, error: "이미 요청 보냄" });
+
+        target.friendRequests.push(from);
+        saveUsers(users);
+        res.json({ success: true });
+    });
 });
 
-app.post("/api/friend/accept", (req, res) => {
-    const { username, friend } = req.body;
-    const users = loadUsers();
-    const user = users.find(x => x.username === username);
-    const target = users.find(x => x.username === friend);
+// ─── 친구 수락 (인증 필수) ───────────────────────────────────────────
+app.post("/api/friend/accept", requireAuth, async (req, res) => {
+    const username = req.user; // JWT에서 추출
+    const { friend } = req.body;
 
-    if (!user || !target) return res.json({ success: false });
+    if (!friend) return res.json({ success: false, error: "대상 없음" });
 
-    user.friendRequests = user.friendRequests.filter(x => x !== friend);
+    await withUserLock(async () => {
+        const users = loadUsers();
+        const user = users.find(x => x.username === username);
+        const target = users.find(x => x.username === friend);
 
-    if (user.friends.includes(friend)) return res.json({ success: false });
+        if (!user || !target) return res.json({ success: false });
 
-    user.friends.push(friend);
-    target.friends.push(username);
-    saveUsers(users);
-    res.json({ success: true });
+        user.friendRequests = user.friendRequests.filter(x => x !== friend);
+
+        if (user.friends.includes(friend)) return res.json({ success: false });
+
+        user.friends.push(friend);
+        target.friends ??= [];
+        target.friends.push(username);
+        saveUsers(users);
+        res.json({ success: true });
+    });
 });
 
 app.get("/api/friends/:username", (req, res) => {
     const users = loadUsers();
     const user = users.find(x => x.username === req.params.username);
-
     if (!user) return res.json({ friends: [], requests: [] });
-
     res.json({ friends: user.friends, requests: user.friendRequests });
 });
 
 app.get("/api/user/:username", (req, res) => {
     const users = loadUsers();
     const user = users.find(x => x.username === req.params.username);
-
     if (!user) return res.status(404).json({ success: false });
-
     res.json({ success: true, username: user.username, stats: user.stats });
 });
 
@@ -671,16 +613,19 @@ app.get("/api/leaderboard", (req, res) => {
     res.json(getLeaderboard(mode));
 });
 
+// ─── 리플레이 조회 — 경로 탐색 취약점 수정 ──────────────────────────
 app.get("/api/replay/:id", (req, res) => {
-    const file = path.join(__dirname, "data", "replays", `${req.params.id}.json`);
-    if (!fs.existsSync(file)) return res.status(404).json({ error: "not found" });
+    const safeId = path.basename(req.params.id); // ../../ 등 차단
+    const file = path.join(REPLAY_DIR, `${safeId}.json`);
+
+    if (!fs.existsSync(file))
+        return res.status(404).json({ error: "not found" });
+
     res.json(JSON.parse(fs.readFileSync(file, "utf8")));
 });
 
-const server = app.listen(23333, () => {
+app.listen(23333, () => {
     console.log("Server running on http://localhost:23333");
 });
 
-setInterval(() => {
-    console.log("alive");
-}, 10000);
+setInterval(() => { console.log("alive"); }, 10000);

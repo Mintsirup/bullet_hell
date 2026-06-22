@@ -1,11 +1,20 @@
 [
     {
-        "id": "8362cb9c-c169-428b-bcf9-31923c40efe9",
+        "id": "e7dc0157-93bf-472e-abe0-e5ac208f2532",
         "name": "mintiua",
-        "score": 674588,
-        "rank": "HC-B",
+        "score": 848507,
+        "rank": "A",
+        "mode": "normal",
+        "replayHash": "7cf398ed1655041c2c94cc63b3d0cc68818bb3521aeee20d6f89a4e6de57f5d3",
+        "time": 1782115974800
+    },
+    {
+        "id": "64f5806b-e1cc-4a5e-b6d5-7f60a3317b44",
+        "name": "mintiua",
+        "score": 164091,
+        "rank": "HC-F",
         "mode": "hardcore",
-        "replayHash": "a7b63a3e4feb27c090a1cda84c0fa600cadefc33e8c91e3292a913737631719b",
-        "time": 1782050435693
+        "replayHash": "aaaa47b20874bfbf92055f7ef9de4ea684d2b4ec325f850df070e91b4b3b0d81",
+        "time": 1782116811628
     }
 ]

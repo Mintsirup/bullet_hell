@@ -236,13 +236,17 @@ async function loadFriends() {
 
                                 headers:{
                                     "Content-Type":
-                                        "application/json"
+                                        "application/json",
+
+                                    "Authorization":
+                                        "Bearer " +
+                                        localStorage.getItem(
+                                            "token"
+                                        )
                                 },
 
                                 body:
                                 JSON.stringify({
-
-                                    username,
 
                                     friend:
                                         request
@@ -311,14 +315,17 @@ async () => {
 
             headers:{
                 "Content-Type":
-                    "application/json"
+                    "application/json",
+
+                "Authorization":
+                    "Bearer " +
+                    localStorage.getItem(
+                        "token"
+                    )
             },
 
             body:
             JSON.stringify({
-
-                from:
-                    username,
 
                 to:
                     friend

@@ -39,8 +39,11 @@ async function register() {
         return;
     }
 
+    // 회원가입 즉시 로그인 처리
+    localStorage.setItem("username", data.username);
+    localStorage.setItem("token", data.token);
+
     alert("회원가입 완료");
 
-    location.href =
-        "/login";
+    location.href = "/";
 }

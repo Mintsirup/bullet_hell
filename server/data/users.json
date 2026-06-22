@@ -1,22 +1,25 @@
 [
     {
         "username": "mintiua",
-        "password": "$2b$12$hKVeDs6HHmtxb2hCKYOAK.NWD2mOvAzX/3p/.5pWb01crLPGskKBu",
+        "password": "$2b$12$9CZpiHFMAaYdS9mGMzYXF.lXo2eMX9cLndivFSaevcNPFNohrphna",
         "stats": {
-            "gamesPlayed": 0,
-            "highestScore": 0,
-            "highestRank": "F",
-            "totalBulletsDodged": 0,
-            "totalBulletsHit": 0,
-            "totalSurvivalTime": 0
+            "gamesPlayed": 2,
+            "highestScore": 848507,
+            "highestRank": "HC-F",
+            "totalBulletsDodged": 10087,
+            "totalBulletsHit": 103,
+            "totalSurvivalTime": 137.76666666666608
         },
-        "achievements": [],
+        "achievements": [
+            "FIRST_GAME",
+            "GET_S"
+        ],
         "friends": [],
         "friendRequests": []
     },
     {
         "username": "이다인",
-        "password": "$2b$12$PB5y2pc16xsxguQwxADZNenTi1Hurgz9kJzDkFqiH8oyI5RUD1XUS",
+        "password": "$2b$12$DgVhrFZ7Z22TQPestvn3Rer9OK.1IQ//nBHXVXEdAQf0A/hMIxdFu",
         "stats": {
             "gamesPlayed": 0,
             "highestScore": 0,

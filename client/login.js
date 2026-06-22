@@ -39,11 +39,8 @@ async function login() {
         return;
     }
 
-    localStorage.setItem(
-        "username",
-        username
-    );
+    localStorage.setItem("username", data.username);
+    localStorage.setItem("token", data.token);
 
-    location.href =
-        "/";
+    location.href = "/";
 }

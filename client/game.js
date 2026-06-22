@@ -328,7 +328,13 @@ async function finishGame(cleared = false) {
 
                     headers: {
                         "Content-Type":
-                            "application/json"
+                            "application/json",
+
+                        "Authorization":
+                            "Bearer " +
+                            localStorage.getItem(
+                                "token"
+                            )
                     },
 
                     body: JSON.stringify({
@@ -336,12 +342,7 @@ async function finishGame(cleared = false) {
                         seed,
                         replayData,
                         replayHash,
-                        result,
-
-                        username:
-                            localStorage.getItem(
-                                "username"
-                            )
+                        result
                     })
                 }
             );
